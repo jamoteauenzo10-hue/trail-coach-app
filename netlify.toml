@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+# Garde le code frontend identique (il appelle "/api/claude") tout en le redirigeant
+# vers la fonction Netlify réelle, hébergée à "/.netlify/functions/claude".
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
