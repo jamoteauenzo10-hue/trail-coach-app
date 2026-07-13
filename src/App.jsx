@@ -318,16 +318,20 @@ function weatherLabel(weather) {
   return parts.join(" · ");
 }
 
-async function extractRunFromImage(base64, mediaType) {
+async function extractRunFromImages(images) {
+  // images: [{ base64, mediaType }]
+  const content = [
+    ...images.map((img) => ({ type: "image", source: { type: "base64", media_type: img.mediaType, data: img.base64 } })),
+    {
+      type: "text",
+      text: images.length > 1
+        ? `Ces ${images.length} captures d'écran proviennent probablement de la même séance de course (résumé, détail des allures, dénivelé...). Combine les informations de toutes les images pour reconstituer les données les plus complètes et précises possible.`
+        : "Extrait les données de cette capture d'écran.",
+    },
+  ];
   const text = await callClaudeAPI({
-    system: "Tu extrais des données de course à pied depuis une capture d'écran d'application de running (Strava ou similaire). Réponds UNIQUEMENT avec un objet JSON, sans texte autour, sans balises markdown. Format exact : {\"distance_km\": number|null, \"duration_sec\": number|null, \"dplus_m\": number|null, \"date_iso\": string|null}. Le temps doit être converti en secondes au total. La date doit être déduite du texte visible et convertie au format YYYY-MM-DD ; si absente ou illisible, mets null plutôt que d'inventer.",
-    messages: [{
-      role: "user",
-      content: [
-        { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } },
-        { type: "text", text: "Extrait les données de cette capture d'écran." },
-      ],
-    }],
+    system: "Tu extrais des données de course à pied depuis une ou plusieurs captures d'écran d'application de running (Strava ou similaire), qui peuvent montrer des vues différentes de la même séance (résumé, allures kilomètre par kilomètre, dénivelé...). Réponds UNIQUEMENT avec un objet JSON, sans texte autour, sans balises markdown. Format exact : {\"distance_km\": number|null, \"duration_sec\": number|null, \"dplus_m\": number|null, \"date_iso\": string|null}. Le temps doit être converti en secondes au total. La date doit être déduite du texte visible et convertie au format YYYY-MM-DD ; si absente ou illisible sur toutes les images, mets null plutôt que d'inventer. Si une valeur n'apparaît clairement que sur une seule des images, utilise-la quand même.",
+    messages: [{ role: "user", content }],
   });
   return parseJsonLoose(text);
 }
@@ -895,7 +899,7 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
   const [extracting, setExtracting] = useState(false);
   const [extractError, setExtractError] = useState(null);
   const [dateWarning, setDateWarning] = useState(null);
-  const [filled, setFilled] = useState(false);
+  const [filledCount, setFilledCount] = useState(0);
 
   function parseDuration(str) {
     const parts = str.split(":").map((p) => parseInt(p, 10));
@@ -906,26 +910,26 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
   }
 
   async function handleImage(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
     setExtracting(true);
     setExtractError(null);
     setDateWarning(null);
     try {
-      const base64 = await new Promise((resolve, reject) => {
+      const images = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
         const r = new FileReader();
-        r.onload = () => resolve(r.result.split(",")[1]);
+        r.onload = () => resolve({ base64: r.result.split(",")[1], mediaType: file.type || "image/jpeg" });
         r.onerror = () => reject(new Error("Lecture impossible"));
         r.readAsDataURL(file);
-      });
-      const data = await extractRunFromImage(base64, file.type || "image/jpeg");
+      })));
+      const data = await extractRunFromImages(images);
       if (data.distance_km) setKm(String(data.distance_km));
       if (data.duration_sec) setDuration(secToDurationStr(data.duration_sec));
       if (data.dplus_m != null) setDplus(String(data.dplus_m));
       if (data.date_iso && data.date_iso !== cursor) {
-        setDateWarning(`La capture semble dater du ${fmtDate(data.date_iso)} — tu es sur le ${fmtDate(cursor)}. Vérifie que c'est le bon jour avant de valider.`);
+        setDateWarning(`Les captures semblent dater du ${fmtDate(data.date_iso)} — tu es sur le ${fmtDate(cursor)}. Vérifie que c'est le bon jour avant de valider.`);
       }
-      setFilled(true);
+      setFilledCount(images.length);
     } catch (err) {
       setExtractError("Extraction impossible, remplis les champs manuellement.");
     } finally {
@@ -958,14 +962,14 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
         border: `1.5px dashed ${TEAL}`, borderRadius: 12, padding: "12px 10px", marginBottom: 14,
         color: TEAL, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "#F0F0F1",
       }}>
-        <input type="file" accept="image/*" onChange={handleImage} style={{ display: "none" }} disabled={extracting} />
-        {extracting ? "Lecture de la capture…" : "📷 Ajouter une capture d'écran (Strava…)"}
+        <input type="file" accept="image/*" multiple onChange={handleImage} style={{ display: "none" }} disabled={extracting} />
+        {extracting ? "Lecture des captures…" : "📷 Ajouter une ou plusieurs captures d'écran (Strava…)"}
       </label>
       {extractError && <div style={{ fontSize: 12, color: CORAL, marginBottom: 10 }}>{extractError}</div>}
       {dateWarning && <div style={{ fontSize: 12, color: SAND, marginBottom: 10, background: "#EFE7DA", borderRadius: 8, padding: "7px 9px" }}>{dateWarning}</div>}
-      {filled && !extractError && (
+      {filledCount > 0 && !extractError && (
         <div style={{ fontSize: 11.5, color: MOSS, marginBottom: 10, display: "flex", alignItems: "center", gap: 5 }}>
-          <Check size={13} /> Champs pré-remplis depuis la capture — vérifie avant de valider.
+          <Check size={13} /> Champs pré-remplis depuis {filledCount > 1 ? `${filledCount} captures` : "la capture"} — vérifie avant de valider.
         </div>
       )}
 
