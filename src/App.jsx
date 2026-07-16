@@ -306,23 +306,25 @@ function getUserCoords() {
 async function fetchWeatherForDate(dateIso, coords) {
   const today = new Date().toISOString().slice(0, 10);
   const daysAhead = daysBetween(today, dateIso);
+  const nowHour = new Date().getHours();
   try {
     let url;
     if (dateIso < today) {
-      url = `https://archive-api.open-meteo.com/v1/archive?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${dateIso}&end_date=${dateIso}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=Europe%2FParis`;
+      url = `https://archive-api.open-meteo.com/v1/archive?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${dateIso}&end_date=${dateIso}&hourly=temperature_2m,precipitation,wind_speed_10m&timezone=Europe%2FParis`;
     } else if (daysAhead <= 15) {
-      url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${dateIso}&end_date=${dateIso}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=Europe%2FParis`;
+      url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${dateIso}&end_date=${dateIso}&hourly=temperature_2m,precipitation,wind_speed_10m&timezone=Europe%2FParis`;
     } else {
       return null;
     }
     const res = await fetch(url);
     const data = await res.json();
-    if (!data.daily || !data.daily.time || data.daily.time.length === 0) return null;
+    if (!data.hourly || !data.hourly.time || data.hourly.time.length === 0) return null;
+    const idx = Math.min(nowHour, data.hourly.temperature_2m.length - 1);
     return {
-      tempMax: Math.round(data.daily.temperature_2m_max[0]),
-      tempMin: Math.round(data.daily.temperature_2m_min[0]),
-      precip: data.daily.precipitation_sum[0],
-      windMax: Math.round(data.daily.wind_speed_10m_max[0]),
+      temp: Math.round(data.hourly.temperature_2m[idx]),
+      precip: data.hourly.precipitation[idx],
+      wind: Math.round(data.hourly.wind_speed_10m[idx]),
+      hour: nowHour,
     };
   } catch (e) {
     return null;
@@ -333,15 +335,14 @@ function weatherIcon(weather, size = 14) {
   if (!weather) return null;
   const props = { size, strokeWidth: 2 };
   if (weather.precip >= 1) return <CloudRain {...props} />;
-  if (weather.windMax >= 30) return <Wind {...props} />;
+  if (weather.wind >= 30) return <Wind {...props} />;
   return <Sun {...props} />;
 }
 
 function weatherLabel(weather) {
   if (!weather) return "";
-  const parts = [`${weather.tempMax}°`];
-  if (weather.tempMin != null) parts[0] += `/${weather.tempMin}°`;
-  parts.push(`vent ${weather.windMax} km/h`);
+  const parts = [`${weather.temp}°`];
+  parts.push(`vent ${weather.wind} km/h`);
   if (weather.precip >= 1) parts.push(`${weather.precip} mm pluie`);
   return parts.join(" · ");
 }
@@ -377,7 +378,7 @@ async function generateCoachComment({ plan, payload, recent, weather }) {
     `${e.date} : ${e.km} km à ${fmtPace(e.paceSec)}/km, D+${e.dplus || 0}m, douleur ${e.pain}/10`
   ).join(" | ");
   const weatherLine = weather
-    ? `${weather.tempMax}°C (min ${weather.tempMin}°C), vent ${weather.windMax} km/h${weather.precip >= 1 ? `, ${weather.precip}mm de pluie` : ""}`
+    ? `${weather.temp}°C, vent ${weather.wind} km/h${weather.precip >= 1 ? `, ${weather.precip}mm de pluie` : ""}`
     : "non disponible";
   const splitsLine = payload.splits && payload.splits.length > 0
     ? payload.splits.map((s) => `km${s.km}:${fmtPace(s.pace_sec)}${s.elevation_m != null ? `(${s.elevation_m > 0 ? "+" : ""}${s.elevation_m}m)` : ""}`).join(", ")
@@ -806,10 +807,10 @@ export default function TrailPrepApp() {
     }
     if (payload.weather) {
       const w = payload.weather;
-      if (w.tempMax >= 24) {
-        msgs.push({ tone: "good", text: `Il faisait chaud ce jour-là (${w.tempMax}°C) — une allure un peu plus lente que prévu s'explique très bien par la météo, pas d'inquiétude à avoir.` });
-      } else if (w.windMax >= 30) {
-        msgs.push({ tone: "good", text: `Vent soutenu ce jour-là (${w.windMax} km/h) — ça pèse sur l'allure et le ressenti, à prendre en compte avant de comparer avec d'autres séances.` });
+      if (w.temp >= 24) {
+        msgs.push({ tone: "good", text: `Il faisait chaud pendant cette séance (${w.temp}°C) — une allure un peu plus lente que prévu s'explique très bien par la météo, pas d'inquiétude à avoir.` });
+      } else if (w.wind >= 30) {
+        msgs.push({ tone: "good", text: `Vent soutenu pendant cette séance (${w.wind} km/h) — ça pèse sur l'allure et le ressenti, à prendre en compte avant de comparer avec d'autres séances.` });
       }
     }
     if (msgs.length === 1 && msgs[0].tone === "good") {
