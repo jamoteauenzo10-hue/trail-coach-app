@@ -353,12 +353,12 @@ async function extractRunFromImages(images) {
     {
       type: "text",
       text: images.length > 1
-        ? `Ces ${images.length} captures d'écran proviennent probablement de la même séance de course (résumé, détail des allures, dénivelé...). Combine les informations de toutes les images pour reconstituer les données les plus complètes et précises possible.`
-        : "Extrait les données de cette capture d'écran.",
+        ? `Ces ${images.length} captures d'écran proviennent probablement de la même séance de course (résumé, détail des allures km par km, dénivelé...). Combine les informations de toutes les images pour reconstituer les données les plus complètes et précises possible, y compris le détail kilomètre par kilomètre si une des captures le montre.`
+        : "Extrait les données de cette capture d'écran, y compris le détail kilomètre par kilomètre si visible.",
     },
   ];
   const text = await callClaudeAPI({
-    system: "Tu extrais des données de course à pied depuis une ou plusieurs captures d'écran d'application de running (Strava ou similaire), qui peuvent montrer des vues différentes de la même séance (résumé, allures kilomètre par kilomètre, dénivelé...). Réponds UNIQUEMENT avec un objet JSON, sans texte autour, sans balises markdown. Format exact : {\"distance_km\": number|null, \"duration_sec\": number|null, \"dplus_m\": number|null, \"date_iso\": string|null}. Le temps doit être converti en secondes au total. La date doit être déduite du texte visible et convertie au format YYYY-MM-DD ; si absente ou illisible sur toutes les images, mets null plutôt que d'inventer. Si une valeur n'apparaît clairement que sur une seule des images, utilise-la quand même.",
+    system: "Tu extrais des données de course à pied depuis une ou plusieurs captures d'écran d'application de running (Strava ou similaire), qui peuvent montrer des vues différentes de la même séance (résumé, allures kilomètre par kilomètre avec dénivelé, carte...). Réponds UNIQUEMENT avec un objet JSON, sans texte autour, sans balises markdown. Format exact : {\"title\": string|null, \"distance_km\": number|null, \"duration_sec\": number|null, \"dplus_m\": number|null, \"date_iso\": string|null, \"splits\": [{\"km\": number, \"pace_sec\": number, \"elevation_m\": number|null}]|null}. Le temps doit être converti en secondes au total. \"splits\" doit contenir une entrée par ligne du tableau de détail kilométrique si une capture le montre (allure de chaque km convertie en secondes, dénivelé de la ligne si présent) ; sinon mets null. \"title\" est le nom donné à l'activité si visible (ex : \"Course à pied le matin\"), sinon null. La date doit être déduite du texte visible et convertie au format YYYY-MM-DD ; si absente ou illisible sur toutes les images, mets null plutôt que d'inventer. Si une valeur n'apparaît clairement que sur une seule des images, utilise-la quand même.",
     messages: [{ role: "user", content }],
   });
   return parseJsonLoose(text);
@@ -379,12 +379,16 @@ async function generateCoachComment({ plan, payload, recent, weather }) {
   const weatherLine = weather
     ? `${weather.tempMax}°C (min ${weather.tempMin}°C), vent ${weather.windMax} km/h${weather.precip >= 1 ? `, ${weather.precip}mm de pluie` : ""}`
     : "non disponible";
+  const splitsLine = payload.splits && payload.splits.length > 0
+    ? payload.splits.map((s) => `km${s.km}:${fmtPace(s.pace_sec)}${s.elevation_m != null ? `(${s.elevation_m > 0 ? "+" : ""}${s.elevation_m}m)` : ""}`).join(", ")
+    : "non disponible";
   const text = await callClaudeAPI({
-    system: "Tu es un coach de trail expérimenté, chaleureux mais direct. Tu réponds en 2 à 4 phrases maximum, en français, sans emoji, sans markdown, sans poser de question. Tu commentes la séance à la lumière du plan prévu, de l'historique récent et de la météo du jour (une allure plus lente par forte chaleur ou grand vent n'est pas un signal d'alarme), en gardant en tête un antécédent de syndrome de l'essuie-glace (IT band) survenu le 28 juin après une descente en fatigue.",
+    system: "Tu es un coach de trail expérimenté, chaleureux mais direct. Tu réponds en 2 à 4 phrases maximum, en français, sans emoji, sans markdown, sans poser de question. Tu commentes la séance à la lumière du plan prévu, de l'historique récent, de la météo du jour (une allure plus lente par forte chaleur ou grand vent n'est pas un signal d'alarme) et du détail kilomètre par kilomètre si disponible (négative/positive split, régularité), en gardant en tête un antécédent de syndrome de l'essuie-glace (IT band) survenu le 28 juin après une descente en fatigue.",
     messages: [{
       role: "user",
       content: `Séance prévue : ${plan?.title || "non planifiée"}${plan?.km ? ` (${plan.km} km, ${plan.pace || ""})` : ""}.
 Séance réalisée : ${payload.km} km à ${fmtPace(payload.paceSec)}/km${payload.dplus ? `, D+${payload.dplus}m` : ""}, douleur genou ${payload.pain}/10, RPE ${payload.rpe}/10.
+Détail km par km : ${splitsLine}.
 Météo du jour : ${weatherLine}.
 Note de l'athlète : ${payload.note || "aucune"}.
 Historique récent : ${recentSummary || "aucun"}.
@@ -1113,6 +1117,7 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
   const [extractError, setExtractError] = useState(null);
   const [dateWarning, setDateWarning] = useState(null);
   const [filledCount, setFilledCount] = useState(0);
+  const [extractedExtra, setExtractedExtra] = useState(null);
 
   function parseDuration(str) {
     const parts = str.split(":").map((p) => parseInt(p, 10));
@@ -1142,6 +1147,7 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
       if (data.date_iso && data.date_iso !== cursor) {
         setDateWarning(`Les captures semblent dater du ${fmtDate(data.date_iso)} — tu es sur le ${fmtDate(cursor)}. Vérifie que c'est le bon jour avant de valider.`);
       }
+      setExtractedExtra({ title: data.title || null, splits: data.splits || null });
       setFilledCount(images.length);
     } catch (err) {
       setExtractError("Extraction impossible, remplis les champs manuellement.");
@@ -1160,6 +1166,8 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
       paceSec: Math.round(durSec / kmNum),
       dplus: dplus ? parseInt(dplus, 10) : 0,
       pain, rpe, note,
+      title: extractedExtra?.title || null,
+      splits: extractedExtra?.splits || null,
     });
   }
 
@@ -1230,15 +1238,67 @@ const inputStyle = {
 /* ============================================================
    VUE — JOURNAL
    ============================================================ */
+function formatExportText(entries) {
+  const list = Object.values(entries).sort((a, b) => a.date.localeCompare(b.date));
+  const lines = ["MES SÉANCES — Côte d'Émeraude", ""];
+  list.forEach((e) => {
+    const plan = PLAN_BY_DATE[e.date];
+    lines.push(`${e.date}${plan ? ` (${plan.phase})` : ""} — ${e.title || "Course"}`);
+    lines.push(`  ${e.km} km à ${fmtPace(e.paceSec)}/km${e.dplus ? `, D+${e.dplus}m` : ""} · douleur ${e.pain}/10 · RPE ${e.rpe}/10`);
+    if (e.weather) lines.push(`  Météo : ${weatherLabel(e.weather)}`);
+    if (e.note) lines.push(`  Note : ${e.note}`);
+    if (e.splits && e.splits.length > 0) {
+      lines.push(`  Détail km/km : ${e.splits.map((s) => `km${s.km} ${fmtPace(s.pace_sec)}${s.elevation_m != null ? `(${s.elevation_m > 0 ? "+" : ""}${s.elevation_m}m)` : ""}`).join(", ")}`);
+    }
+    lines.push("");
+  });
+  return lines.join("\n");
+}
+
 function JournalView({ entries }) {
   const list = Object.values(entries).sort((a, b) => b.date.localeCompare(a.date));
   const [openDate, setOpenDate] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [exportText, setExportText] = useState(null);
+
+  async function handleExport() {
+    const text = formatExportText(entries);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (e) {
+      setExportText(text);
+    }
+  }
+
   if (list.length === 0) {
     return <div style={{ padding: 32, textAlign: "center", color: "#8A8A92", fontSize: 13.5 }}>Aucune séance enregistrée pour l'instant.</div>;
   }
   return (
     <div style={{ padding: "18px", paddingLeft: "calc(18px + env(safe-area-inset-left))", paddingRight: "calc(18px + env(safe-area-inset-right))" }}>
-      <div style={{ fontFamily: DISPLAY_FONT, fontSize: 26, fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 14 }}>Journal.</div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+        <div style={{ fontFamily: DISPLAY_FONT, fontSize: 26, fontWeight: 900, letterSpacing: "-0.02em" }}>Journal.</div>
+        <button onClick={handleExport} style={{
+          background: PAPER, border: `1px solid ${SILVER}`, borderRadius: 10, padding: "7px 12px",
+          fontSize: 11.5, fontWeight: 600, color: INK, cursor: "pointer",
+        }}>
+          {copied ? "Copié ✓" : "Exporter"}
+        </button>
+      </div>
+
+      {exportText && (
+        <Card>
+          <div style={{ fontSize: 11.5, color: MUTED, marginBottom: 8 }}>
+            Copie automatique indisponible — sélectionne tout le texte ci-dessous et copie-le manuellement.
+          </div>
+          <textarea
+            readOnly value={exportText} rows={8}
+            onFocus={(e) => e.target.select()}
+            style={{ width: "100%", fontSize: 11, fontFamily: MONO_FONT, border: `1px solid ${SILVER}`, borderRadius: 8, padding: 8, boxSizing: "border-box" }}
+          />
+        </Card>
+      )}
       {list.map((e) => {
         const plan = PLAN_BY_DATE[e.date];
         const open = openDate === e.date;
@@ -1272,6 +1332,17 @@ function JournalView({ entries }) {
                 {e.weather && (
                   <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 5, color: MUTED }}>
                     {weatherIcon(e.weather)} {weatherLabel(e.weather)}
+                  </div>
+                )}
+                {e.splits && e.splits.length > 0 && (
+                  <div style={{ marginTop: 8 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 4 }}>Détail km par km</div>
+                    {e.splits.map((s, i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, padding: "3px 0", borderTop: i > 0 ? `1px solid ${SILVER}` : "none" }}>
+                        <span style={{ color: MUTED }}>Km {s.km}</span>
+                        <span style={{ fontFamily: MONO_FONT }}>{fmtPace(s.pace_sec)}/km{s.elevation_m != null ? ` · ${s.elevation_m > 0 ? "+" : ""}${s.elevation_m}m` : ""}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
