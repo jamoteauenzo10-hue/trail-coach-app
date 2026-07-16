@@ -62,7 +62,7 @@ function addDays(dateStr, n) {
 
 const TRANSITION = [
   { offset: 0, type: "renfo", title: "Renfo A — Haut du corps", details: "30-40 min.", renfoKey: "A" },
-  { offset: 1, type: "course", title: "Footing très facile", km: 6, pace: "5:30-5:50", details: "Ajout à la demande — vraiment easy, ça s'ajoute à la récup de Quiberon, ça ne la remplace pas. Aucune ambition sur cette séance." },
+  { offset: 1, type: "course", title: "Footing très facile", km: 6, pace: "5:30-5:50/km", details: "Ajout à la demande — vraiment easy, ça s'ajoute à la récup de Quiberon, ça ne la remplace pas. Aucune ambition sur cette séance." },
   { offset: 2, type: "renfo", title: "Renfo B — Jambes / hanches", details: "30-40 min, focus moyen fessier / TFL.", renfoKey: "B" },
   { offset: 3, type: "course", title: "Sortie easy", km: 15, dplus: 100, pace: "5:20-5:40", details: "Terrain plat ou très légèrement vallonné. Aucune recherche de perf." },
 ];
@@ -83,37 +83,37 @@ const P = {
 
 /* ---- Détail des exercices, référencés par renfoKey ---- */
 const SEANCE_A = [
-  { name: "Pompes (standard / genoux / surélevées)", sets: "3-4 × 8-15 reps" },
-  { name: "Pompes piquées (épaules)", sets: "3 × 8-12 reps" },
-  { name: "Dips sur chaise", sets: "3 × 10-15 reps" },
-  { name: "Rowing élastique (ou sac à dos lesté)", sets: "3 × 12 reps" },
-  { name: "Gainage planche + variantes latérales", sets: "3 × 30-45 sec / côté" },
-  { name: "Superman (dos)", sets: "3 × 12 reps" },
+  { name: "Pompes (standard / genoux / surélevées)", sets: "3-4 × 8-15 reps", setsCount: 4, workSec: 35, restSec: 30 },
+  { name: "Pompes piquées (épaules)", sets: "3 × 8-12 reps", setsCount: 3, workSec: 30, restSec: 30 },
+  { name: "Dips sur chaise", sets: "3 × 10-15 reps", setsCount: 3, workSec: 30, restSec: 30 },
+  { name: "Rowing élastique (ou sac à dos lesté)", sets: "3 × 12 reps", setsCount: 3, workSec: 30, restSec: 25 },
+  { name: "Gainage planche + variantes latérales", sets: "3 × 30-45 sec / côté", setsCount: 3, workSec: 40, restSec: 20 },
+  { name: "Superman (dos)", sets: "3 × 12 reps", setsCount: 3, workSec: 30, restSec: 20 },
 ];
 const SEANCE_B = [
-  { name: "Hip thrust unilatéral (pied surélevé)", sets: "3 × 10-12 reps / jambe" },
-  { name: "Pont fessier", sets: "3 × 15 reps" },
-  { name: "Step-ups (marche / chaise)", sets: "3 × 10-12 reps / jambe" },
-  { name: "Squats bulgares (pied arrière surélevé)", sets: "3 × 8-10 reps / jambe" },
-  { name: "Clamshells avec élastique", sets: "3 × 15-20 reps / côté" },
-  { name: "Abduction de hanche allongé", sets: "3 × 15 reps / côté" },
-  { name: "Fentes marchées", sets: "2 × 10 reps / jambe" },
-  { name: "Mollets sur marche", sets: "3 × 15-20 reps" },
+  { name: "Hip thrust unilatéral (pied surélevé)", sets: "3 × 10-12 reps / jambe", setsCount: 3, workSec: 45, restSec: 30 },
+  { name: "Pont fessier", sets: "3 × 15 reps", setsCount: 3, workSec: 30, restSec: 25 },
+  { name: "Step-ups (marche / chaise)", sets: "3 × 10-12 reps / jambe", setsCount: 3, workSec: 45, restSec: 30 },
+  { name: "Squats bulgares (pied arrière surélevé)", sets: "3 × 8-10 reps / jambe", setsCount: 3, workSec: 45, restSec: 30 },
+  { name: "Clamshells avec élastique", sets: "3 × 15-20 reps / côté", setsCount: 3, workSec: 40, restSec: 20 },
+  { name: "Abduction de hanche allongé", sets: "3 × 15 reps / côté", setsCount: 3, workSec: 40, restSec: 20 },
+  { name: "Fentes marchées", sets: "2 × 10 reps / jambe", setsCount: 2, workSec: 40, restSec: 25 },
+  { name: "Mollets sur marche", sets: "3 × 15-20 reps", setsCount: 3, workSec: 30, restSec: 20 },
 ];
 const SEANCE_A_LIGHT = [
-  { name: "Pompes", sets: "2 × 10 reps" },
-  { name: "Gainage planche", sets: "2 × 30 sec" },
-  { name: "Mobilité épaules / thoracique", sets: "5 min" },
+  { name: "Pompes", sets: "2 × 10 reps", setsCount: 2, workSec: 25, restSec: 20 },
+  { name: "Gainage planche", sets: "2 × 30 sec", setsCount: 2, workSec: 30, restSec: 15 },
+  { name: "Mobilité épaules / thoracique", sets: "5 min", setsCount: 1, workSec: 300, restSec: 0 },
 ];
 const SEANCE_B_LIGHT = [
-  { name: "Clamshells avec élastique", sets: "2 × 15 reps / côté" },
-  { name: "Pont fessier", sets: "2 × 15 reps" },
-  { name: "Abduction de hanche allongé", sets: "2 × 12 reps / côté" },
+  { name: "Clamshells avec élastique", sets: "2 × 15 reps / côté", setsCount: 2, workSec: 35, restSec: 15 },
+  { name: "Pont fessier", sets: "2 × 15 reps", setsCount: 2, workSec: 25, restSec: 15 },
+  { name: "Abduction de hanche allongé", sets: "2 × 12 reps / côté", setsCount: 2, workSec: 30, restSec: 15 },
 ];
 const ACTIVATION = [
-  { name: "Clamshells avec élastique", sets: "2 × 15 reps / côté" },
-  { name: "Marche latérale élastique (monster walk)", sets: "2 × 15 pas / côté" },
-  { name: "Pont fessier", sets: "2 × 10 reps" },
+  { name: "Clamshells avec élastique", sets: "2 × 15 reps / côté", setsCount: 2, workSec: 35, restSec: 15 },
+  { name: "Marche latérale élastique (monster walk)", sets: "2 × 15 pas / côté", setsCount: 2, workSec: 30, restSec: 15 },
+  { name: "Pont fessier", sets: "2 × 10 reps", setsCount: 2, workSec: 25, restSec: 15 },
 ];
 const RENFO_SETS = { A: SEANCE_A, B: SEANCE_B, A_LIGHT: SEANCE_A_LIGHT, B_LIGHT: SEANCE_B_LIGHT, ACTIVATION };
 const RENFO_LABEL = {
@@ -122,67 +122,67 @@ const RENFO_LABEL = {
   ACTIVATION: "Activation hanches (optionnel, sans fatigue)",
 };
 
-const construction = (start, label, tueKm, thuDetail, thuKm, satKm, satD, sunKm, sunD, sunNote) => phaseWeek({
+const construction = (start, label, tueKm, thuDetail, thuKm, satKm, satD, sunKm, sunD, sunNote, thuPace = "4:55-5:05/km", satPace = "5:20-5:45/km") => phaseWeek({
   start, label, color: P.sand,
   days: [
     { type: "repos", title: "Repos complet" },
-    { type: "course_renfo", title: "Course facile", km: tueKm, pace: "5:20-5:35", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
+    { type: "course_renfo", title: "Course facile", km: tueKm, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
     { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié, pas de course ce jour. Focus moyen fessier / TFL.", renfoKey: "B" },
-    { type: "course", title: "Course qualité", km: thuKm, pace: "soutenu", details: thuDetail },
+    { type: "course", title: "Course qualité", km: thuKm, pace: thuPace, details: thuDetail },
     { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
-    { type: "course", title: "Course vallonnée", km: satKm, dplus: satD, pace: "conversationnelle", details: "Terrain spécifique, dénivelé progressif." },
-    { type: "course", title: "Sortie longue", km: sunKm, dplus: sunD, pace: "5:20-5:40", details: sunNote || "Petits pas en descente, cadence rapide." },
+    { type: "course", title: "Course vallonnée", km: satKm, dplus: satD, pace: satPace, details: "Terrain spécifique, dénivelé progressif." },
+    { type: "course", title: "Sortie longue", km: sunKm, dplus: sunD, pace: "5:20-5:40/km", details: sunNote || "Petits pas en descente, cadence rapide." },
   ],
 });
 
 const PLAN = [
-  ...construction("2026-07-13", "S1 — Construction", 8, "15 min échauffement + 12-15 min allure soutenue + retour au calme.", 8, 8, 150, 16, 120),
-  ...construction("2026-07-20", "S2 — Construction", 9, "15 min échauffement + 8 répétitions de 30-40 sec en côte courte ou escalier (effort quasi maximal), retour en trottinant entre chaque + 10 min retour au calme.", 8, 9, 175, 19, 150, "Premier test ravito léger si la sortie dépasse 1h15."),
-  ...construction("2026-07-27", "S3 — Construction", 10, "15 min échauffement + 20-25 min à allure seuil (proche allure semi-marathon) + retour au calme.", 8, 10, 200, 22, 220, "Début officiel du protocole nutrition course : ~60 g glucides/heure dès la 2ᵉ heure."),
-  ...construction("2026-08-03", "S4 — Spécifique 1", 10, "15 min échauffement + 10 répétitions de 30-45 sec en côte ou escalier, retour en trottinant + retour au calme.", 9, 12, 250, 25, 320, "Nutrition à nouveau testée, ajuster selon le ressenti précédent."),
+  ...construction("2026-07-13", "S1 — Construction", 8, "15 min échauffement + 12-15 min allure soutenue + retour au calme.", 8, 8, 150, 16, 120, undefined, "4:55-5:05/km"),
+  ...construction("2026-07-20", "S2 — Construction", 9, "15 min échauffement + 8 répétitions de 30-40 sec en côte courte ou escalier (effort quasi maximal), retour en trottinant entre chaque + 10 min retour au calme.", 8, 9, 175, 19, 150, "Premier test ravito léger si la sortie dépasse 1h15.", "quasi max (8-9/10 RPE)"),
+  ...construction("2026-07-27", "S3 — Construction", 10, "15 min échauffement + 20-25 min à allure seuil (proche allure semi-marathon) + retour au calme.", 8, 10, 200, 22, 220, "Début officiel du protocole nutrition course : ~60 g glucides/heure dès la 2ᵉ heure.", "4:50-5:00/km"),
+  ...construction("2026-08-03", "S4 — Spécifique 1", 10, "15 min échauffement + 10 répétitions de 30-45 sec en côte ou escalier, retour en trottinant + retour au calme.", 9, 12, 250, 25, 320, "Nutrition à nouveau testée, ajuster selon le ressenti précédent.", "quasi max (8-9/10 RPE)"),
   ...phaseWeek({
     start: "2026-08-10", label: "S5 — Spécifique 2", color: P.navy,
     days: [
       { type: "repos", title: "Repos complet" },
-      { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35", details: "Raccourcir le renfo à 20 min si les jambes sont lourdes.", renfoKey: "A" },
+      { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35/km", details: "Raccourcir le renfo à 20 min si les jambes sont lourdes.", renfoKey: "A" },
       { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié.", renfoKey: "B" },
-      { type: "course", title: "Course qualité", km: 8, pace: "soutenu", details: "15 min échauffement + 8-10 répétitions de 45 sec en côte ou escalier, focus fréquence de foulée + retour au calme." },
+      { type: "course", title: "Course qualité", km: 8, pace: "quasi max (8-9/10 RPE)", details: "15 min échauffement + 8-10 répétitions de 45 sec en côte ou escalier, focus fréquence de foulée + retour au calme." },
       { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
-      { type: "course", title: "Bloc fatigue — jour 1", km: 18, dplus: 350, pace: "spécifique", details: "Premier jour du week-end enchaîné." },
-      { type: "course", title: "Bloc fatigue — jour 2", km: 27, dplus: 380, pace: "spécifique", details: "Sur jambes fatiguées de la veille. Observer la réaction du genou en descente en fin de bloc." },
+      { type: "course", title: "Bloc fatigue — jour 1", km: 18, dplus: 350, pace: "5:15-5:35/km", details: "Premier jour du week-end enchaîné." },
+      { type: "course", title: "Bloc fatigue — jour 2", km: 27, dplus: 380, pace: "5:20-5:50/km", details: "Sur jambes fatiguées de la veille, l'allure ralentit naturellement — c'est normal. Observer la réaction du genou en descente en fin de bloc." },
     ],
   }),
   ...phaseWeek({
     start: "2026-08-17", label: "S6 — Spécifique 3 (pic)", color: P.navy,
     days: [
       { type: "repos", title: "Repos complet" },
-      { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
+      { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
       { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié.", renfoKey: "B" },
-      { type: "course", title: "Course qualité modérée", km: 9, pace: "modéré", details: "15 min échauffement + 4-5 accélérations progressives de 20 sec + retour au calme. Garder de la fraîcheur pour le week-end." },
+      { type: "course", title: "Course qualité modérée", km: 9, pace: "5:00-5:15/km", details: "15 min échauffement + 4-5 accélérations progressives de 20 sec + retour au calme. Garder de la fraîcheur pour le week-end." },
       { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
-      { type: "course", title: "Vallonné très léger", km: 8, dplus: 100, pace: "easy", details: "Jambes actives sans les fatiguer avant la sortie reine du lendemain." },
-      { type: "course", title: "Sortie longue de référence — 40 km", km: 40, dplus: 750, pace: "allure course", details: "La grosse sortie de la préparation, 3 semaines avant la course pile. Ravitaillement réel (60 g glucides/h), gestion des transitions course/marche sur terrain technique. Si possible, termine sur du sable pour retrouver la sensation des 10 derniers km du parcours." },
+      { type: "course", title: "Vallonné très léger", km: 8, dplus: 100, pace: "5:30-5:50/km", details: "Jambes actives sans les fatiguer avant la sortie reine du lendemain." },
+      { type: "course", title: "Sortie longue de référence — 40 km", km: 40, dplus: 750, pace: "5:45-6:15/km sur le plat", details: "La grosse sortie de la préparation, 3 semaines avant la course pile. Ravitaillement réel (60 g glucides/h), gestion des transitions course/marche sur terrain technique. Le rythme global de la journée (marche comprise) tournera plutôt vers 6:30-7:00/km, comme le jour J. Si possible, termine sur du sable pour retrouver la sensation des 10 derniers km du parcours." },
     ],
   }),
-  ...construction("2026-08-24", "S7 — Décharge", 8, "15 min échauffement + 4-5 lignes droites de 20 sec + retour au calme. Intensité minimale, semaine de décharge.", 7, 8, 150, 20, 180, "Pas de recherche de performance, volume tranquille."),
+  ...construction("2026-08-24", "S7 — Décharge", 8, "15 min échauffement + 4-5 lignes droites de 20 sec + retour au calme. Intensité minimale, semaine de décharge.", 7, 8, 150, 20, 180, "Pas de recherche de performance, volume tranquille.", "libre, sans chrono"),
   ...phaseWeek({
     start: "2026-08-31", label: "S8 — Affûtage", color: P.mist,
     days: [
       { type: "repos", title: "Repos complet" },
-      { type: "course_renfo", title: "Footing", km: 6, pace: "easy", details: "Renfo allégée le soir, sans charge.", renfoKey: "A_LIGHT" },
+      { type: "course_renfo", title: "Footing", km: 6, pace: "5:30-5:50/km", details: "Renfo allégée le soir, sans charge.", renfoKey: "A_LIGHT" },
       { type: "renfo", title: "Renfo B allégée", details: "Activation seulement, pas de charge.", renfoKey: "B_LIGHT" },
-      { type: "course", title: "Footing + lignes droites", km: 5, pace: "easy", details: "3-4 accélérations courtes pour garder du tonus." },
+      { type: "course", title: "Footing + lignes droites", km: 5, pace: "5:30-5:50/km", details: "3-4 accélérations courtes pour garder du tonus." },
       { type: "repos", title: "Repos", details: "Vérifier le matériel : chaussures trail, ravitos, montre chargée." },
       { type: "repos", title: "Repos ou marche" },
-      { type: "course", title: "Footing facile", km: 8, pace: "easy", details: "Dernière sortie avant la semaine de course." },
+      { type: "course", title: "Footing facile", km: 8, pace: "5:30-5:50/km", details: "Dernière sortie avant la semaine de course." },
     ],
   }),
   ...phaseWeek({
     start: "2026-09-07", label: "S9 — Semaine de course", color: P.coral,
     days: [
-      { type: "course", title: "Footing très court", km: 3, pace: "easy", details: "20 min, easy." },
+      { type: "course", title: "Footing très court", km: 3, pace: "5:30-5:50/km", details: "20 min, easy." },
       { type: "repos", title: "Repos ou marche" },
-      { type: "course", title: "Footing + accélérations", km: 4, pace: "easy", details: "20-25 min avec 2-3 accélérations courtes (10-15s)." },
+      { type: "course", title: "Footing + accélérations", km: 4, pace: "5:30-5:50/km", details: "20-25 min avec 2-3 accélérations courtes (10-15s)." },
       { type: "repos", title: "Repos complet" },
       { type: "repos", title: "Repos complet", details: "Préparation sac / ravitos, coucher tôt." },
       { type: "race", title: "COURSE — Trail Côte d'Émeraude", km: 54, dplus: 1200, pace: "6h00-6h30", details: "Départ prudent. Gestion des descentes en 2ᵉ moitié. Nutrition 60 g glucides/h dès H2." },
@@ -433,6 +433,122 @@ function RunningLoader() {
       </div>
       <div style={{ fontSize: 11, color: MUTED, marginTop: 3, letterSpacing: 0.5, textTransform: "uppercase" }}>
         Préparation en cours
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   MINUTEUR GUIDÉ POUR LE RENFO
+   ============================================================ */
+function beep(freq = 880, dur = 150) {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.16, ctx.currentTime);
+    osc.start();
+    osc.stop(ctx.currentTime + dur / 1000);
+  } catch (e) { /* audio indisponible, tant pis */ }
+}
+
+function buildTimeline(exercises) {
+  const steps = [];
+  exercises.forEach((ex, exIndex) => {
+    const sets = ex.setsCount || 3;
+    for (let s = 0; s < sets; s++) {
+      steps.push({ exIndex, setIndex: s, totalSets: sets, phase: "work", duration: ex.workSec || 40, name: ex.name, display: ex.sets });
+      const isLastOverall = exIndex === exercises.length - 1 && s === sets - 1;
+      if (!isLastOverall && ex.restSec > 0) {
+        steps.push({ exIndex, setIndex: s, totalSets: sets, phase: "rest", duration: ex.restSec || 20, name: ex.name, display: ex.sets });
+      }
+    }
+  });
+  return steps;
+}
+
+function estimateDuration(exercises) {
+  const steps = buildTimeline(exercises);
+  const totalSec = steps.reduce((sum, s) => sum + s.duration, 0);
+  return Math.round(totalSec / 60);
+}
+
+function WorkoutTimer({ exercises, label, onExit }) {
+  const timeline = useMemo(() => buildTimeline(exercises), [exercises]);
+  const [stepIdx, setStepIdx] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(timeline[0]?.duration || 0);
+  const [running, setRunning] = useState(true);
+  const done = stepIdx >= timeline.length;
+  const step = timeline[stepIdx];
+
+  useEffect(() => {
+    setSecondsLeft(timeline[stepIdx]?.duration || 0);
+  }, [stepIdx, timeline]);
+
+  useEffect(() => {
+    if (!running || done) return;
+    if (secondsLeft <= 0) {
+      beep(step?.phase === "work" ? 720 : 1000);
+      setStepIdx((i) => i + 1);
+      return;
+    }
+    const t = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [secondsLeft, running, done, step]);
+
+  const overlayStyle = {
+    position: "fixed", inset: 0, background: `linear-gradient(160deg, ${INK}, ${GRAPHITE})`,
+    zIndex: 10000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+    color: "white", padding: "env(safe-area-inset-top) 20px env(safe-area-inset-bottom)",
+  };
+  const circleBtnStyle = {
+    background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.25)", color: "white",
+    borderRadius: 24, padding: "12px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+  };
+
+  if (done) {
+    return (
+      <div style={overlayStyle}>
+        <Check size={44} color="white" />
+        <div style={{ fontFamily: DISPLAY_FONT, fontSize: 22, fontWeight: 900, marginTop: 14 }}>Séance terminée</div>
+        <div style={{ fontSize: 12.5, opacity: 0.6, marginTop: 4 }}>Bien joué.</div>
+        <button onClick={onExit} style={{ ...circleBtnStyle, marginTop: 26 }}>Fermer</button>
+      </div>
+    );
+  }
+
+  const nextStep = timeline[stepIdx + 1];
+  return (
+    <div style={overlayStyle}>
+      <button onClick={onExit} style={{ position: "absolute", top: "calc(20px + env(safe-area-inset-top))", right: 20, background: "none", border: "none", color: "white", opacity: 0.7 }}>
+        <X size={22} />
+      </button>
+      <div style={{ fontSize: 11, opacity: 0.55, textTransform: "uppercase", letterSpacing: 1 }}>{label}</div>
+      <div style={{
+        fontFamily: DISPLAY_FONT, fontSize: 23, fontWeight: 900, marginTop: 8, textAlign: "center",
+        padding: "0 12px", lineHeight: 1.1,
+      }}>
+        {step.name}
+      </div>
+      <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>
+        Série {step.setIndex + 1}/{step.totalSets} · {step.phase === "work" ? "Travail" : "Repos"} · {step.display}
+      </div>
+      <div style={{
+        fontFamily: MONO_FONT, fontSize: 76, fontWeight: 700, marginTop: 22,
+        color: step.phase === "rest" ? "#B8C4C0" : "white",
+      }}>
+        {secondsLeft}
+      </div>
+      <div style={{ fontSize: 12, opacity: 0.5, marginTop: 12, minHeight: 16 }}>
+        {nextStep ? `Suivant : ${nextStep.phase === "work" ? nextStep.name : "repos"}` : "Dernière étape"}
+      </div>
+      <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+        <button onClick={() => setRunning((r) => !r)} style={circleBtnStyle}>{running ? "Pause" : "Reprendre"}</button>
+        <button onClick={() => setStepIdx((i) => i + 1)} style={circleBtnStyle}>Passer →</button>
       </div>
     </div>
   );
@@ -803,8 +919,10 @@ function TodayView({ cursor, goDay, plan, logged, formOpen, setFormOpen, submitL
 
 function RenfoDetail({ renfoKey }) {
   const [open, setOpen] = useState(false);
+  const [launched, setLaunched] = useState(false);
   const list = RENFO_SETS[renfoKey];
   if (!list) return null;
+  const duration = estimateDuration(list);
   return (
     <div style={{ marginTop: 12, borderTop: `1px solid ${SILVER}` }}>
       <button
@@ -821,15 +939,26 @@ function RenfoDetail({ renfoKey }) {
         </span>
         <ChevronDown size={16} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
       </button>
-      {open && list.map((ex, i) => (
-        <div key={i} style={{
-          display: "flex", justifyContent: "space-between", gap: 10, fontSize: 12.5, padding: "8px 0",
-          borderTop: `1px solid ${SILVER}`,
-        }}>
-          <span style={{ color: BODY_TEXT }}>{ex.name}</span>
-          <span style={{ fontFamily: MONO_FONT, color: MUTED, flexShrink: 0, whiteSpace: "nowrap" }}>{ex.sets}</span>
-        </div>
-      ))}
+      {open && (
+        <>
+          {list.map((ex, i) => (
+            <div key={i} style={{
+              display: "flex", justifyContent: "space-between", gap: 10, fontSize: 12.5, padding: "8px 0",
+              borderTop: `1px solid ${SILVER}`,
+            }}>
+              <span style={{ color: BODY_TEXT }}>{ex.name}</span>
+              <span style={{ fontFamily: MONO_FONT, color: MUTED, flexShrink: 0, whiteSpace: "nowrap" }}>{ex.sets}</span>
+            </div>
+          ))}
+          <button onClick={() => setLaunched(true)} style={{ ...primaryBtnStyle, marginTop: 12, padding: "10px 0", fontSize: 13 }}>
+            Lancer la séance (~{duration} min)
+          </button>
+          <div style={{ fontSize: 10.5, color: MUTED, marginTop: 6, textAlign: "center" }}>
+            Durées indicatives — adapte à ton rythme, tu peux passer une étape à tout moment.
+          </div>
+        </>
+      )}
+      {launched && <WorkoutTimer exercises={list} label={RENFO_LABEL[renfoKey]} onExit={() => setLaunched(false)} />}
     </div>
   );
 }
