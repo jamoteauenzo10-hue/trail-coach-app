@@ -122,13 +122,13 @@ const RENFO_LABEL = {
   ACTIVATION: "Activation hanches (optionnel, sans fatigue)",
 };
 
-const construction = (start, label, tueKm, thuDetail, thuKm, satKm, satD, sunKm, sunD, sunNote, thuPace = "4:55-5:05/km", satPace = "5:20-5:45/km") => phaseWeek({
+const construction = (start, label, tueKm, thuDetail, thuKm, satKm, satD, sunKm, sunD, sunNote, thuPace = "4:40-4:50/km", satPace = "5:20-5:45/km", thuBlocks = null) => phaseWeek({
   start, label, color: P.sand,
   days: [
     { type: "repos", title: "Repos complet" },
     { type: "course_renfo", title: "Course facile", km: tueKm, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
     { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié, pas de course ce jour. Focus moyen fessier / TFL.", renfoKey: "B" },
-    { type: "course", title: "Course qualité", km: thuKm, pace: thuPace, details: thuDetail },
+    { type: "course", title: "Course qualité", km: thuKm, pace: thuPace, details: thuDetail, blocks: thuBlocks },
     { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
     { type: "course", title: "Course vallonnée", km: satKm, dplus: satD, pace: satPace, details: "Terrain spécifique, dénivelé progressif." },
     { type: "course", title: "Sortie longue", km: sunKm, dplus: sunD, pace: "5:20-5:40/km", details: sunNote || "Petits pas en descente, cadence rapide." },
@@ -136,17 +136,37 @@ const construction = (start, label, tueKm, thuDetail, thuKm, satKm, satD, sunKm,
 });
 
 const PLAN = [
-  ...construction("2026-07-13", "S1 — Construction", 8, "15 min échauffement + 12-15 min allure soutenue + retour au calme.", 8, 8, 150, 16, 120, undefined, "4:55-5:05/km"),
-  ...construction("2026-07-20", "S2 — Construction", 9, "15 min échauffement + 8 répétitions de 30-40 sec en côte courte ou escalier (effort quasi maximal), retour en trottinant entre chaque + 10 min retour au calme.", 8, 9, 175, 19, 150, "Premier test ravito léger si la sortie dépasse 1h15.", "quasi max (8-9/10 RPE)"),
-  ...construction("2026-07-27", "S3 — Construction", 10, "15 min échauffement + 20-25 min à allure seuil (proche allure semi-marathon) + retour au calme.", 8, 10, 200, 22, 220, "Début officiel du protocole nutrition course : ~60 g glucides/heure dès la 2ᵉ heure.", "4:50-5:00/km"),
-  ...construction("2026-08-03", "S4 — Spécifique 1", 10, "15 min échauffement + 10 répétitions de 30-45 sec en côte ou escalier, retour en trottinant + retour au calme.", 9, 12, 250, 25, 320, "Nutrition à nouveau testée, ajuster selon le ressenti précédent.", "quasi max (8-9/10 RPE)"),
+  ...construction("2026-07-13", "S1 — Construction", 8, "15 min échauffement + 12-15 min allure soutenue + retour au calme.", 8, 8, 150, 16, 120, undefined, "4:20-4:35/km", undefined, [
+    { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing très facile, réveiller les jambes." },
+    { label: "Corps de séance", duration: "12-15 min", pace: "4:20-4:35/km", note: "Effort franchement difficile — plus rapide que ta zone confortable de 10 km (~4:40). Tu dois sentir que ça pousse." },
+    { label: "Retour au calme", duration: "8-10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
+  ]),
+  ...construction("2026-07-20", "S2 — Construction", 9, "15 min échauffement + 8 répétitions de 30-40 sec en côte courte ou escalier (effort quasi maximal), retour en trottinant entre chaque + 10 min retour au calme.", 8, 9, 175, 19, 150, "Premier test ravito léger si la sortie dépasse 1h15.", "quasi max (8-9/10 RPE)", undefined, [
+    { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing facile + quelques foulées dynamiques avant la première répétition." },
+    { label: "Répétitions en côte", duration: "8 × 30-40 sec", pace: "quasi max (8-9/10 RPE)", note: "Sur côte courte ou escalier. Retour en trottinant/marchant entre chaque." },
+    { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
+  ]),
+  ...construction("2026-07-27", "S3 — Construction", 10, "15 min échauffement + 20-25 min à allure seuil (proche allure semi-marathon) + retour au calme.", 8, 10, 200, 22, 220, "Début officiel du protocole nutrition course : ~60 g glucides/heure dès la 2ᵉ heure.", "4:30-4:45/km", undefined, [
+    { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing facile, monter progressivement en allure sur la fin." },
+    { label: "Bloc seuil", duration: "20-25 min", pace: "4:30-4:45/km", note: "Plus rapide que ta zone confortable de 10 km (~4:40) — c'est voulu, l'effort doit être exigeant tout en restant tenable sur la durée." },
+    { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
+  ]),
+  ...construction("2026-08-03", "S4 — Spécifique 1", 10, "15 min échauffement + 10 répétitions de 30-45 sec en côte ou escalier, retour en trottinant + retour au calme.", 9, 12, 250, 25, 320, "Nutrition à nouveau testée, ajuster selon le ressenti précédent.", "quasi max (8-9/10 RPE)", undefined, [
+    { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing facile + foulées dynamiques." },
+    { label: "Répétitions en côte", duration: "10 × 30-45 sec", pace: "quasi max (8-9/10 RPE)", note: "Sur côte ou escalier. Retour en trottinant entre chaque." },
+    { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
+  ]),
   ...phaseWeek({
     start: "2026-08-10", label: "S5 — Spécifique 2", color: P.navy,
     days: [
       { type: "repos", title: "Repos complet" },
       { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35/km", details: "Raccourcir le renfo à 20 min si les jambes sont lourdes.", renfoKey: "A" },
       { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié.", renfoKey: "B" },
-      { type: "course", title: "Course qualité", km: 8, pace: "quasi max (8-9/10 RPE)", details: "15 min échauffement + 8-10 répétitions de 45 sec en côte ou escalier, focus fréquence de foulée + retour au calme." },
+      { type: "course", title: "Course qualité", km: 8, pace: "quasi max (8-9/10 RPE)", details: "15 min échauffement + 8-10 répétitions de 45 sec en côte ou escalier, focus fréquence de foulée + retour au calme.", blocks: [
+        { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km" },
+        { label: "Répétitions en côte", duration: "8-10 × 45 sec", pace: "quasi max (8-9/10 RPE)", note: "Focus fréquence de foulée. Retour en trottinant entre chaque." },
+        { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km" },
+      ] },
       { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
       { type: "course", title: "Bloc fatigue — jour 1", km: 18, dplus: 350, pace: "5:15-5:35/km", details: "Premier jour du week-end enchaîné." },
       { type: "course", title: "Bloc fatigue — jour 2", km: 27, dplus: 380, pace: "5:20-5:50/km", details: "Sur jambes fatiguées de la veille, l'allure ralentit naturellement — c'est normal. Observer la réaction du genou en descente en fin de bloc." },
@@ -158,13 +178,21 @@ const PLAN = [
       { type: "repos", title: "Repos complet" },
       { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
       { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié.", renfoKey: "B" },
-      { type: "course", title: "Course qualité modérée", km: 9, pace: "5:00-5:15/km", details: "15 min échauffement + 4-5 accélérations progressives de 20 sec + retour au calme. Garder de la fraîcheur pour le week-end." },
+      { type: "course", title: "Course qualité modérée", km: 9, pace: "4:25-4:45/km", details: "15 min échauffement + 4-5 accélérations progressives de 20 sec + retour au calme. Garder de la fraîcheur pour le week-end.", blocks: [
+        { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km" },
+        { label: "Accélérations progressives", duration: "4-5 × 20 sec", pace: "4:25-4:45/km", note: "Ça doit piquer un peu sur la fin de chaque répétition, sans aller chercher le chrono à fond — garder de la fraîcheur pour le week-end." },
+        { label: "Retour au calme", duration: "8-10 min", pace: "5:50-6:15/km" },
+      ] },
       { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
       { type: "course", title: "Vallonné très léger", km: 8, dplus: 100, pace: "5:30-5:50/km", details: "Jambes actives sans les fatiguer avant la sortie reine du lendemain." },
       { type: "course", title: "Sortie longue de référence — 40 km", km: 40, dplus: 750, pace: "5:45-6:15/km sur le plat", details: "La grosse sortie de la préparation, 3 semaines avant la course pile. Ravitaillement réel (60 g glucides/h), gestion des transitions course/marche sur terrain technique. Le rythme global de la journée (marche comprise) tournera plutôt vers 6:30-7:00/km, comme le jour J. Si possible, termine sur du sable pour retrouver la sensation des 10 derniers km du parcours." },
     ],
   }),
-  ...construction("2026-08-24", "S7 — Décharge", 8, "15 min échauffement + 4-5 lignes droites de 20 sec + retour au calme. Intensité minimale, semaine de décharge.", 7, 8, 150, 20, 180, "Pas de recherche de performance, volume tranquille.", "libre, sans chrono"),
+  ...construction("2026-08-24", "S7 — Décharge", 8, "15 min échauffement + 4-5 lignes droites de 20 sec + retour au calme. Intensité minimale, semaine de décharge.", 7, 8, 150, 20, 180, "Pas de recherche de performance, volume tranquille.", "libre, sans chrono", undefined, [
+    { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km" },
+    { label: "Lignes droites", duration: "4-5 × 20 sec", pace: "vif, sans forcer", note: "Retour marché entre chaque." },
+    { label: "Retour au calme", duration: "8-10 min", pace: "5:50-6:15/km" },
+  ]),
   ...phaseWeek({
     start: "2026-08-31", label: "S8 — Affûtage", color: P.mist,
     days: [
@@ -378,6 +406,61 @@ function typeIcon(type, size = 16) {
 }
 function typeLabel(type) {
   return { repos: "Repos", renfo: "Renfo", course_renfo: "Course + Renfo", course: "Course", race: "Course" }[type] || "Course";
+}
+
+/* ============================================================
+   DÉTAIL DE SÉANCE — structure échauffement / corps / retour au calme
+   ============================================================ */
+function paceToSecPerKm(paceStr) {
+  if (!paceStr) return null;
+  const m = paceStr.match(/(\d+):(\d+)/);
+  if (!m) return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
+function estimateDurationLabel(km, paceStr) {
+  const sec = paceToSecPerKm(paceStr);
+  if (!sec || !km) return null;
+  const totalMin = Math.round((sec * km) / 60);
+  if (totalMin >= 60) {
+    const h = Math.floor(totalMin / 60), m = totalMin % 60;
+    return `~${h}h${m > 0 ? String(m).padStart(2, "0") : ""}`;
+  }
+  return `~${totalMin} min`;
+}
+
+function SessionDetail({ plan }) {
+  const [open, setOpen] = useState(true);
+  const blocks = plan.blocks || [
+    { label: plan.title, duration: estimateDurationLabel(plan.km, plan.pace), pace: plan.pace, note: plan.details },
+  ];
+  return (
+    <div style={{ marginTop: 12, borderTop: `1px solid ${SILVER}` }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: "100%", background: "none", border: "none", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "11px 0", fontSize: 12.5, fontWeight: 700, color: INK,
+          textTransform: "uppercase", letterSpacing: 0.4,
+        }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <Footprints size={14} /> Détail de la séance
+        </span>
+        <ChevronDown size={16} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+      </button>
+      {open && blocks.map((b, i) => (
+        <div key={i} style={{ padding: "9px 0", borderTop: `1px solid ${SILVER}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: INK }}>{b.label}</span>
+            <span style={{ fontFamily: MONO_FONT, fontSize: 11.5, color: MUTED, flexShrink: 0, whiteSpace: "nowrap" }}>{b.duration}</span>
+          </div>
+          {b.pace && <div style={{ fontFamily: MONO_FONT, fontSize: 12, color: SAND, marginTop: 2 }}>{b.pace}</div>}
+          {b.note && <div style={{ fontSize: 12, color: "#6B6B72", marginTop: 3, lineHeight: 1.4 }}>{b.note}</div>}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 /* ============================================================
@@ -868,7 +951,8 @@ function TodayView({ cursor, goDay, plan, logged, formOpen, setFormOpen, submitL
             </div>
           )}
 
-          {plan.details && <p style={{ fontSize: 13, lineHeight: 1.5, color: "#3A3A3F", marginTop: 8 }}>{plan.details}</p>}
+          {(plan.type === "course" || plan.type === "course_renfo" || plan.type === "race") && <SessionDetail plan={plan} />}
+          {(plan.type === "renfo" || plan.type === "repos") && plan.details && <p style={{ fontSize: 13, lineHeight: 1.5, color: "#3A3A3F", marginTop: 8 }}>{plan.details}</p>}
           {plan.renfoKey && <RenfoDetail renfoKey={plan.renfoKey} />}
 
           {runnable && !logged && !formOpen && (
