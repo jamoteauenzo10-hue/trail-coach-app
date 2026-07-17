@@ -136,9 +136,9 @@ const construction = (start, label, tueKm, thuDetail, thuKm, satKm, satD, sunKm,
 });
 
 const PLAN = [
-  ...construction("2026-07-13", "S1 — Construction", 8, "15 min échauffement + 12-15 min allure soutenue + retour au calme.", 8, 8, 150, 16, 120, undefined, "4:20-4:35/km", undefined, [
+  ...construction("2026-07-13", "S1 — Construction", 8, "15 min échauffement + 12-15 min allure soutenue + retour au calme.", 8, 8, 150, 16, 120, undefined, "4:00-4:15/km", undefined, [
     { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing très facile, réveiller les jambes." },
-    { label: "Corps de séance", duration: "12-15 min", pace: "4:20-4:35/km", note: "Effort franchement difficile — plus rapide que ta zone confortable de 10 km (~4:40). Tu dois sentir que ça pousse." },
+    { label: "Corps de séance", duration: "12-15 min", pace: "4:00-4:15/km", note: "Effort vraiment dur — tu dois sentir que tu bosses, pas juste que ça pousse un peu. C'est ta vraie zone difficile, pas ta zone confortable de 10 km (~4:40)." },
     { label: "Retour au calme", duration: "8-10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
   ]),
   ...construction("2026-07-20", "S2 — Construction", 9, "15 min échauffement + 8 répétitions de 30-40 sec en côte courte ou escalier (effort quasi maximal), retour en trottinant entre chaque + 10 min retour au calme.", 8, 9, 175, 19, 150, "Premier test ravito léger si la sortie dépasse 1h15.", "quasi max (8-9/10 RPE)", undefined, [
@@ -146,9 +146,9 @@ const PLAN = [
     { label: "Répétitions en côte", duration: "8 × 30-40 sec", pace: "quasi max (8-9/10 RPE)", note: "Sur côte courte ou escalier. Retour en trottinant/marchant entre chaque." },
     { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
   ]),
-  ...construction("2026-07-27", "S3 — Construction", 10, "15 min échauffement + 20-25 min à allure seuil (proche allure semi-marathon) + retour au calme.", 8, 10, 200, 22, 220, "Début officiel du protocole nutrition course : ~60 g glucides/heure dès la 2ᵉ heure.", "4:30-4:45/km", undefined, [
+  ...construction("2026-07-27", "S3 — Construction", 10, "15 min échauffement + 20-25 min à allure seuil (proche allure semi-marathon) + retour au calme.", 8, 10, 200, 22, 220, "Début officiel du protocole nutrition course : ~60 g glucides/heure dès la 2ᵉ heure.", "4:15-4:30/km", undefined, [
     { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing facile, monter progressivement en allure sur la fin." },
-    { label: "Bloc seuil", duration: "20-25 min", pace: "4:30-4:45/km", note: "Plus rapide que ta zone confortable de 10 km (~4:40) — c'est voulu, l'effort doit être exigeant tout en restant tenable sur la durée." },
+    { label: "Bloc seuil", duration: "20-25 min", pace: "4:15-4:30/km", note: "Un cran sous ton effort vraiment dur (~4:00-4:15 sur 15 min) — tenable sur la durée, mais ça doit rester exigeant du début à la fin." },
     { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
   ]),
   ...construction("2026-08-03", "S4 — Spécifique 1", 10, "15 min échauffement + 10 répétitions de 30-45 sec en côte ou escalier, retour en trottinant + retour au calme.", 9, 12, 250, 25, 320, "Nutrition à nouveau testée, ajuster selon le ressenti précédent.", "quasi max (8-9/10 RPE)", undefined, [
@@ -178,9 +178,9 @@ const PLAN = [
       { type: "repos", title: "Repos complet" },
       { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
       { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié.", renfoKey: "B" },
-      { type: "course", title: "Course qualité modérée", km: 9, pace: "4:25-4:45/km", details: "15 min échauffement + 4-5 accélérations progressives de 20 sec + retour au calme. Garder de la fraîcheur pour le week-end.", blocks: [
+      { type: "course", title: "Course qualité modérée", km: 9, pace: "4:05-4:25/km", details: "15 min échauffement + 4-5 accélérations progressives de 20 sec + retour au calme. Garder de la fraîcheur pour le week-end.", blocks: [
         { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km" },
-        { label: "Accélérations progressives", duration: "4-5 × 20 sec", pace: "4:25-4:45/km", note: "Ça doit piquer un peu sur la fin de chaque répétition, sans aller chercher le chrono à fond — garder de la fraîcheur pour le week-end." },
+        { label: "Accélérations progressives", duration: "4-5 × 20 sec", pace: "4:05-4:25/km", note: "Vif sans aller chercher le chrono à fond sur chaque répétition — garder de la fraîcheur pour le week-end." },
         { label: "Retour au calme", duration: "8-10 min", pace: "5:50-6:15/km" },
       ] },
       { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
@@ -213,7 +213,7 @@ const PLAN = [
       { type: "course", title: "Footing + accélérations", km: 4, pace: "5:30-5:50/km", details: "20-25 min avec 2-3 accélérations courtes (10-15s)." },
       { type: "repos", title: "Repos complet" },
       { type: "repos", title: "Repos complet", details: "Préparation sac / ravitos, coucher tôt." },
-      { type: "race", title: "COURSE — Trail Côte d'Émeraude", km: 54, dplus: 1200, pace: "6h00-6h30", details: "Départ prudent. Gestion des descentes en 2ᵉ moitié. Nutrition 60 g glucides/h dès H2." },
+      { type: "race", title: "COURSE — Trail Côte d'Émeraude", km: 54, dplus: 1200, pace: "6h00-6h30 (visé 5h45-6h15)", details: "Objectif officiel 6h00-6h30 pour la stratégie course/ravito. Scénario ambitieux si tout va bien : 5h45-6h15 (calcul km-effort ITRA : 74 km-effort, basé sur ton niveau actuel). Départ prudent, gestion des descentes en 2ᵉ moitié, nutrition 60 g glucides/h dès H2." },
     ],
   }),
 ];
@@ -331,19 +331,29 @@ async function fetchWeatherForDate(dateIso, coords) {
   }
 }
 
-function weatherIcon(weather, size = 14) {
+function normalizeWeather(weather) {
   if (!weather) return null;
+  return {
+    temp: weather.temp ?? weather.tempMax ?? null,
+    wind: weather.wind ?? weather.windMax ?? null,
+    precip: weather.precip ?? 0,
+  };
+}
+function weatherIcon(weather, size = 14) {
+  const w = normalizeWeather(weather);
+  if (!w || w.temp == null) return null;
   const props = { size, strokeWidth: 2 };
-  if (weather.precip >= 1) return <CloudRain {...props} />;
-  if (weather.wind >= 30) return <Wind {...props} />;
+  if (w.precip >= 1) return <CloudRain {...props} />;
+  if (w.wind >= 30) return <Wind {...props} />;
   return <Sun {...props} />;
 }
 
 function weatherLabel(weather) {
-  if (!weather) return "";
-  const parts = [`${weather.temp}°`];
-  parts.push(`vent ${weather.wind} km/h`);
-  if (weather.precip >= 1) parts.push(`${weather.precip} mm pluie`);
+  const w = normalizeWeather(weather);
+  if (!w || w.temp == null) return "";
+  const parts = [`${w.temp}°`];
+  if (w.wind != null) parts.push(`vent ${w.wind} km/h`);
+  if (w.precip >= 1) parts.push(`${w.precip} mm pluie`);
   return parts.join(" · ");
 }
 
@@ -354,12 +364,28 @@ async function extractRunFromImages(images) {
     {
       type: "text",
       text: images.length > 1
-        ? `Ces ${images.length} captures d'écran proviennent probablement de la même séance de course (résumé, détail des allures km par km, dénivelé...). Combine les informations de toutes les images pour reconstituer les données les plus complètes et précises possible, y compris le détail kilomètre par kilomètre si une des captures le montre.`
-        : "Extrait les données de cette capture d'écran, y compris le détail kilomètre par kilomètre si visible.",
+        ? `Ces ${images.length} captures d'écran proviennent probablement de la même séance de course (résumé, détail des allures km par km, zones d'allure Z1-Z6, VAP, description avec structure d'intervalles). Combine les informations de toutes les images pour reconstituer les données les plus complètes et précises possible.`
+        : "Extrait les données de cette capture d'écran, avec le maximum de détail possible.",
     },
   ];
   const text = await callClaudeAPI({
-    system: "Tu extrais des données de course à pied depuis une ou plusieurs captures d'écran d'application de running (Strava ou similaire), qui peuvent montrer des vues différentes de la même séance (résumé, allures kilomètre par kilomètre avec dénivelé, carte...). Réponds UNIQUEMENT avec un objet JSON, sans texte autour, sans balises markdown. Format exact : {\"title\": string|null, \"distance_km\": number|null, \"duration_sec\": number|null, \"dplus_m\": number|null, \"date_iso\": string|null, \"splits\": [{\"km\": number, \"pace_sec\": number, \"elevation_m\": number|null}]|null}. Le temps doit être converti en secondes au total. \"splits\" doit contenir une entrée par ligne du tableau de détail kilométrique si une capture le montre (allure de chaque km convertie en secondes, dénivelé de la ligne si présent) ; sinon mets null. \"title\" est le nom donné à l'activité si visible (ex : \"Course à pied le matin\"), sinon null. La date doit être déduite du texte visible et convertie au format YYYY-MM-DD ; si absente ou illisible sur toutes les images, mets null plutôt que d'inventer. Si une valeur n'apparaît clairement que sur une seule des images, utilise-la quand même.",
+    system: `Tu extrais des données de course à pied depuis une ou plusieurs captures d'écran d'application de running (Strava ou similaire). Ces captures peuvent montrer : un résumé (distance, durée, D+, titre, date), un tableau d'allures kilomètre par kilomètre avec dénivelé, un graphique de zones d'allure (Z1 à Z6 avec pourcentages et fourchettes), une VAP (vitesse ajustée à la pente), et/ou une description texte de la séance écrite par l'athlète qui peut contenir une structure d'intervalles du type "15mn 5:40 / 15mn 4:00 / 15mn 5:10" (durée en minutes suivie d'une allure min:sec/km).
+
+Réponds UNIQUEMENT avec un objet JSON, sans texte autour, sans balises markdown. Format exact :
+{
+  "title": string|null,
+  "distance_km": number|null,
+  "duration_sec": number|null,
+  "elapsed_sec": number|null,
+  "dplus_m": number|null,
+  "date_iso": string|null,
+  "vap_pace_sec": number|null,
+  "splits": [{"km": number, "pace_sec": number, "elevation_m": number|null}]|null,
+  "zones": [{"zone": string, "percent": number, "pace_range": string}]|null,
+  "intervals": [{"duration_min": number, "pace_sec": number}]|null
+}
+
+Règles : tous les temps/allures en secondes. "duration_sec" est le temps de déplacement (moving time) ; "elapsed_sec" le temps total écoulé si différent et visible, sinon null. "vap_pace_sec" est l'allure VAP moyenne en secondes/km si affichée. "zones" reprend chaque ligne Z1-Z6 visible (nom de zone, pourcentage, fourchette d'allure telle qu'affichée). "intervals" reprend la structure tapée par l'athlète dans la description de l'activité si elle suit un format "Xmn allure" — un objet par ligne, dans l'ordre. "title" est le nom de l'activité. La date doit être déduite du texte visible (YYYY-MM-DD), sinon null. N'invente jamais une valeur absente : mets null. Si une valeur n'apparaît clairement que sur une seule des images, utilise-la quand même.`,
     messages: [{ role: "user", content }],
   });
   return parseJsonLoose(text);
@@ -383,13 +409,20 @@ async function generateCoachComment({ plan, payload, recent, weather }) {
   const splitsLine = payload.splits && payload.splits.length > 0
     ? payload.splits.map((s) => `km${s.km}:${fmtPace(s.pace_sec)}${s.elevation_m != null ? `(${s.elevation_m > 0 ? "+" : ""}${s.elevation_m}m)` : ""}`).join(", ")
     : "non disponible";
+  const zonesLine = payload.zones && payload.zones.length > 0
+    ? payload.zones.map((z) => `${z.zone} ${z.percent}%`).join(", ")
+    : "non disponible";
+  const intervalsLine = payload.intervals && payload.intervals.length > 0
+    ? payload.intervals.map((iv) => `${iv.duration_min}min à ${fmtPace(iv.pace_sec)}/km`).join(" / ")
+    : null;
   const text = await callClaudeAPI({
-    system: "Tu es un coach de trail expérimenté, chaleureux mais direct. Tu réponds en 2 à 4 phrases maximum, en français, sans emoji, sans markdown, sans poser de question. Tu commentes la séance à la lumière du plan prévu, de l'historique récent, de la météo du jour (une allure plus lente par forte chaleur ou grand vent n'est pas un signal d'alarme) et du détail kilomètre par kilomètre si disponible (négative/positive split, régularité), en gardant en tête un antécédent de syndrome de l'essuie-glace (IT band) survenu le 28 juin après une descente en fatigue.",
+    system: "Tu es un coach de trail expérimenté, chaleureux mais direct. Tu réponds en 2 à 4 phrases maximum, en français, sans emoji, sans markdown, sans poser de question. Tu commentes la séance à la lumière du plan prévu, de l'historique récent, de la météo du jour (une allure plus lente par forte chaleur ou grand vent n'est pas un signal d'alarme), du détail kilomètre par kilomètre (négative/positive split, régularité), des zones d'allure (répartition VO2max/seuil/endurance) et de la structure d'intervalles si l'athlète en a suivi une, en gardant en tête un antécédent de syndrome de l'essuie-glace (IT band) survenu le 28 juin après une descente en fatigue.",
     messages: [{
       role: "user",
       content: `Séance prévue : ${plan?.title || "non planifiée"}${plan?.km ? ` (${plan.km} km, ${plan.pace || ""})` : ""}.
 Séance réalisée : ${payload.km} km à ${fmtPace(payload.paceSec)}/km${payload.dplus ? `, D+${payload.dplus}m` : ""}, douleur genou ${payload.pain}/10, RPE ${payload.rpe}/10.
-Détail km par km : ${splitsLine}.
+${payload.vapPaceSec ? `VAP moyenne : ${fmtPace(payload.vapPaceSec)}/km.\n` : ""}${intervalsLine ? `Structure suivie par l'athlète : ${intervalsLine}.\n` : ""}Détail km par km : ${splitsLine}.
+Zones d'allure : ${zonesLine}.
 Météo du jour : ${weatherLine}.
 Note de l'athlète : ${payload.note || "aucune"}.
 Historique récent : ${recentSummary || "aucun"}.
@@ -1148,7 +1181,14 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
       if (data.date_iso && data.date_iso !== cursor) {
         setDateWarning(`Les captures semblent dater du ${fmtDate(data.date_iso)} — tu es sur le ${fmtDate(cursor)}. Vérifie que c'est le bon jour avant de valider.`);
       }
-      setExtractedExtra({ title: data.title || null, splits: data.splits || null });
+      setExtractedExtra({
+        title: data.title || null,
+        splits: data.splits || null,
+        zones: data.zones || null,
+        intervals: data.intervals || null,
+        vapPaceSec: data.vap_pace_sec || null,
+        elapsedSec: data.elapsed_sec || null,
+      });
       setFilledCount(images.length);
     } catch (err) {
       setExtractError("Extraction impossible, remplis les champs manuellement.");
@@ -1169,6 +1209,10 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
       pain, rpe, note,
       title: extractedExtra?.title || null,
       splits: extractedExtra?.splits || null,
+      zones: extractedExtra?.zones || null,
+      intervals: extractedExtra?.intervals || null,
+      vapPaceSec: extractedExtra?.vapPaceSec || null,
+      elapsedSec: extractedExtra?.elapsedSec || null,
     });
   }
 
@@ -1246,8 +1290,16 @@ function formatExportText(entries) {
     const plan = PLAN_BY_DATE[e.date];
     lines.push(`${e.date}${plan ? ` (${plan.phase})` : ""} — ${e.title || "Course"}`);
     lines.push(`  ${e.km} km à ${fmtPace(e.paceSec)}/km${e.dplus ? `, D+${e.dplus}m` : ""} · douleur ${e.pain}/10 · RPE ${e.rpe}/10`);
+    if (e.vapPaceSec) lines.push(`  VAP moyenne : ${fmtPace(e.vapPaceSec)}/km`);
+    if (e.elapsedSec) lines.push(`  Temps écoulé (arrêts compris) : ${secToDurationStr(e.elapsedSec)}`);
     if (e.weather) lines.push(`  Météo : ${weatherLabel(e.weather)}`);
     if (e.note) lines.push(`  Note : ${e.note}`);
+    if (e.intervals && e.intervals.length > 0) {
+      lines.push(`  Structure : ${e.intervals.map((iv) => `${iv.duration_min}min@${fmtPace(iv.pace_sec)}`).join(" / ")}`);
+    }
+    if (e.zones && e.zones.length > 0) {
+      lines.push(`  Zones : ${e.zones.map((z) => `${z.zone} ${z.percent}%`).join(", ")}`);
+    }
     if (e.splits && e.splits.length > 0) {
       lines.push(`  Détail km/km : ${e.splits.map((s) => `km${s.km} ${fmtPace(s.pace_sec)}${s.elevation_m != null ? `(${s.elevation_m > 0 ? "+" : ""}${s.elevation_m}m)` : ""}`).join(", ")}`);
     }
@@ -1333,6 +1385,34 @@ function JournalView({ entries }) {
                 {e.weather && (
                   <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 5, color: MUTED }}>
                     {weatherIcon(e.weather)} {weatherLabel(e.weather)}
+                  </div>
+                )}
+                {e.vapPaceSec && (
+                  <div style={{ marginTop: 4 }}>VAP moyenne : {fmtPace(e.vapPaceSec)}/km</div>
+                )}
+                {e.elapsedSec && Math.abs(e.elapsedSec - Math.round(e.km * e.paceSec)) > 30 && (
+                  <div style={{ marginTop: 4 }}>Temps écoulé (arrêts compris) : {secToDurationStr(e.elapsedSec)}</div>
+                )}
+                {e.intervals && e.intervals.length > 0 && (
+                  <div style={{ marginTop: 8 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 4 }}>Structure de la séance</div>
+                    {e.intervals.map((iv, i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, padding: "3px 0", borderTop: i > 0 ? `1px solid ${SILVER}` : "none" }}>
+                        <span style={{ color: MUTED }}>{iv.duration_min} min</span>
+                        <span style={{ fontFamily: MONO_FONT }}>{fmtPace(iv.pace_sec)}/km</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {e.zones && e.zones.length > 0 && (
+                  <div style={{ marginTop: 8 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 4 }}>Zones d'allure</div>
+                    {e.zones.map((z, i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, padding: "3px 0", borderTop: i > 0 ? `1px solid ${SILVER}` : "none" }}>
+                        <span style={{ color: MUTED }}>{z.zone} ({z.pace_range})</span>
+                        <span style={{ fontFamily: MONO_FONT }}>{z.percent}%</span>
+                      </div>
+                    ))}
                   </div>
                 )}
                 {e.splits && e.splits.length > 0 && (
