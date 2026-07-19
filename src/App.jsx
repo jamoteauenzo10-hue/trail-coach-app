@@ -122,62 +122,87 @@ const RENFO_LABEL = {
   ACTIVATION: "Activation hanches (optionnel, sans fatigue)",
 };
 
-const construction = (start, label, tueKm, thuDetail, thuKm, satKm, satD, sunKm, sunD, sunNote, thuPace = "4:40-4:50/km", satPace = "5:20-5:45/km", thuBlocks = null) => phaseWeek({
-  start, label, color: P.sand,
+/* S1 figée telle que vécue (ancien rythme Mar/Jeu/Sam/Dim) */
+const S1_WEEK = phaseWeek({
+  start: "2026-07-13", label: "S1 — Construction", color: P.sand,
   days: [
     { type: "repos", title: "Repos complet" },
-    { type: "course_renfo", title: "Course facile", km: tueKm, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
+    { type: "course_renfo", title: "Course facile", km: 8, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
     { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié, pas de course ce jour. Focus moyen fessier / TFL.", renfoKey: "B" },
-    { type: "course", title: "Course qualité", km: thuKm, pace: thuPace, details: thuDetail, blocks: thuBlocks },
+    { type: "course", title: "Course qualité", km: 8, pace: "4:00-4:15/km", details: "15 min échauffement + 12-15 min allure soutenue + retour au calme.", blocks: [
+      { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing très facile, réveiller les jambes." },
+      { label: "Corps de séance", duration: "12-15 min", pace: "4:00-4:15/km", note: "Effort vraiment dur — tu dois sentir que tu bosses, pas juste que ça pousse un peu. C'est ta vraie zone difficile, pas ta zone confortable de 10 km (~4:40)." },
+      { label: "Retour au calme", duration: "8-10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
+    ] },
     { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
-    { type: "course", title: "Course vallonnée", km: satKm, dplus: satD, pace: satPace, details: "Terrain spécifique, dénivelé progressif." },
+    { type: "course", title: "Course vallonnée", km: 8, dplus: 150, pace: "5:20-5:45/km", details: "Terrain spécifique, dénivelé progressif." },
+    { type: "course", title: "Sortie longue", km: 16, dplus: 120, pace: "5:20-5:40/km", details: "Petits pas en descente, cadence rapide." },
+  ],
+});
+
+/* Nouveau rythme à partir de S2 : Lun renfo B / Mar EF+renfo A / Mer qualité / Jeu repos / Ven vallonné / Sam repos / Dim longue */
+const constructionV2 = (start, label, tueKm, wedDetail, wedKm, friKm, friD, sunKm, sunD, sunNote, wedPace = "4:40-4:50/km", friPace = "5:20-5:45/km", wedBlocks = null) => phaseWeek({
+  start, label, color: P.sand,
+  days: [
+    { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié, pas de course ce jour. Focus moyen fessier / TFL — placé en début de semaine pour arriver frais sur le week-end.", renfoKey: "B" },
+    { type: "course_renfo", title: "Course facile", km: tueKm, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
+    { type: "course", title: "Course qualité", km: wedKm, pace: wedPace, details: wedDetail, blocks: wedBlocks },
+    { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
+    { type: "course", title: "Course vallonnée", km: friKm, dplus: friD, pace: friPace, details: "Terrain spécifique, dénivelé progressif." },
+    { type: "repos", title: "Repos complet" },
     { type: "course", title: "Sortie longue", km: sunKm, dplus: sunD, pace: "5:20-5:40/km", details: sunNote || "Petits pas en descente, cadence rapide." },
   ],
 });
 
 const PLAN = [
-  ...construction("2026-07-13", "S1 — Construction", 8, "15 min échauffement + 12-15 min allure soutenue + retour au calme.", 8, 8, 150, 16, 120, undefined, "4:00-4:15/km", undefined, [
-    { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing très facile, réveiller les jambes." },
-    { label: "Corps de séance", duration: "12-15 min", pace: "4:00-4:15/km", note: "Effort vraiment dur — tu dois sentir que tu bosses, pas juste que ça pousse un peu. C'est ta vraie zone difficile, pas ta zone confortable de 10 km (~4:40)." },
-    { label: "Retour au calme", duration: "8-10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
-  ]),
-  ...construction("2026-07-20", "S2 — Construction", 9, "15 min échauffement + 8 répétitions de 30-40 sec en côte courte ou escalier (effort quasi maximal), retour en trottinant entre chaque + 10 min retour au calme.", 8, 9, 175, 19, 150, "Premier test ravito léger si la sortie dépasse 1h15.", "quasi max (8-9/10 RPE)", undefined, [
+  ...S1_WEEK,
+  ...constructionV2("2026-07-20", "S2 — Construction", 9, "15 min échauffement + 8 répétitions de 30-40 sec en côte courte ou escalier (effort quasi maximal), retour en trottinant entre chaque + 10 min retour au calme.", 8, 9, 175, 20, 160, "Premier test ravito léger si la sortie dépasse 1h15.", "quasi max (8-9/10 RPE)", undefined, [
     { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing facile + quelques foulées dynamiques avant la première répétition." },
     { label: "Répétitions en côte", duration: "8 × 30-40 sec", pace: "quasi max (8-9/10 RPE)", note: "Sur côte courte ou escalier. Retour en trottinant/marchant entre chaque." },
     { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
   ]),
-  ...construction("2026-07-27", "S3 — Construction", 10, "15 min échauffement + 20-25 min à allure seuil (proche allure semi-marathon) + retour au calme.", 8, 10, 200, 22, 220, "Début officiel du protocole nutrition course : ~60 g glucides/heure dès la 2ᵉ heure.", "4:15-4:30/km", undefined, [
+  ...constructionV2("2026-07-27", "S3 — Construction", 10, "15 min échauffement + 20-25 min à allure seuil (proche allure semi-marathon) + retour au calme.", 8, 10, 200, 25, 240, "Début officiel du protocole nutrition course : ~60 g glucides/heure dès la 2ᵉ heure.", "4:15-4:30/km", undefined, [
     { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing facile, monter progressivement en allure sur la fin." },
     { label: "Bloc seuil", duration: "20-25 min", pace: "4:15-4:30/km", note: "Un cran sous ton effort vraiment dur (~4:00-4:15 sur 15 min) — tenable sur la durée, mais ça doit rester exigeant du début à la fin." },
     { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
   ]),
-  ...construction("2026-08-03", "S4 — Spécifique 1", 10, "15 min échauffement + 10 répétitions de 30-45 sec en côte ou escalier, retour en trottinant + retour au calme.", 9, 12, 250, 25, 320, "Nutrition à nouveau testée, ajuster selon le ressenti précédent.", "quasi max (8-9/10 RPE)", undefined, [
-    { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing facile + foulées dynamiques." },
-    { label: "Répétitions en côte", duration: "10 × 30-45 sec", pace: "quasi max (8-9/10 RPE)", note: "Sur côte ou escalier. Retour en trottinant entre chaque." },
-    { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
-  ]),
+  ...phaseWeek({
+    start: "2026-08-03", label: "S4 — Spécifique 1", color: P.navy,
+    days: [
+      { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié, placé en début de semaine avant le week-end enchaîné.", renfoKey: "B" },
+      { type: "course_renfo", title: "Course facile", km: 10, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
+      { type: "course", title: "Course qualité", km: 9, pace: "quasi max (8-9/10 RPE)", details: "15 min échauffement + 10 répétitions de 30-45 sec en côte ou escalier, retour en trottinant + retour au calme.", blocks: [
+        { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km", note: "Footing facile + foulées dynamiques." },
+        { label: "Répétitions en côte", duration: "10 × 30-45 sec", pace: "quasi max (8-9/10 RPE)", note: "Sur côte ou escalier. Retour en trottinant entre chaque." },
+        { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km", note: "Trottiner très facile." },
+      ] },
+      { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
+      { type: "course", title: "Bloc fatigue — jour 1", km: 16, dplus: 300, pace: "5:15-5:35/km", details: "Premier week-end enchaîné de la prépa, dès cette semaine." },
+      { type: "repos", title: "Repos complet" },
+      { type: "course", title: "Bloc fatigue — jour 2 — 30 km", km: 30, dplus: 400, pace: "5:20-5:50/km", details: "Sur jambes fatiguées de la veille, l'allure ralentit naturellement — c'est normal. Ta première sortie à 30 km. Nutrition à nouveau testée. Observer la réaction du genou en descente en fin de bloc." },
+    ],
+  }),
   ...phaseWeek({
     start: "2026-08-10", label: "S5 — Spécifique 2", color: P.navy,
     days: [
-      { type: "repos", title: "Repos complet" },
+      { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié, placé en début de semaine avant le week-end enchaîné.", renfoKey: "B" },
       { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35/km", details: "Raccourcir le renfo à 20 min si les jambes sont lourdes.", renfoKey: "A" },
-      { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié.", renfoKey: "B" },
       { type: "course", title: "Course qualité", km: 8, pace: "quasi max (8-9/10 RPE)", details: "15 min échauffement + 8-10 répétitions de 45 sec en côte ou escalier, focus fréquence de foulée + retour au calme.", blocks: [
         { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km" },
         { label: "Répétitions en côte", duration: "8-10 × 45 sec", pace: "quasi max (8-9/10 RPE)", note: "Focus fréquence de foulée. Retour en trottinant entre chaque." },
         { label: "Retour au calme", duration: "10 min", pace: "5:50-6:15/km" },
       ] },
       { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
-      { type: "course", title: "Bloc fatigue — jour 1", km: 18, dplus: 350, pace: "5:15-5:35/km", details: "Premier jour du week-end enchaîné." },
-      { type: "course", title: "Bloc fatigue — jour 2", km: 27, dplus: 380, pace: "5:20-5:50/km", details: "Sur jambes fatiguées de la veille, l'allure ralentit naturellement — c'est normal. Observer la réaction du genou en descente en fin de bloc." },
+      { type: "course", title: "Bloc fatigue — jour 1", km: 20, dplus: 350, pace: "5:15-5:40/km", details: "Deuxième week-end enchaîné, un cran au-dessus du précédent." },
+      { type: "repos", title: "Repos complet" },
+      { type: "course", title: "Bloc fatigue — jour 2 — 33 km", km: 33, dplus: 420, pace: "5:20-5:50/km", details: "Sur jambes fatiguées de la veille — normal que l'allure ralentisse. Observer la réaction du genou en descente en fin de bloc." },
     ],
   }),
   ...phaseWeek({
     start: "2026-08-17", label: "S6 — Spécifique 3 (pic)", color: P.navy,
     days: [
-      { type: "repos", title: "Repos complet" },
+      { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié, dernière séance costaude avant le pic.", renfoKey: "B" },
       { type: "course_renfo", title: "Course facile", km: 9, pace: "5:20-5:35/km", details: "Course d'abord, renfo le soir.", renfoKey: "A" },
-      { type: "renfo", title: "Renfo B — Jambes / hanches", details: "Dédié.", renfoKey: "B" },
       { type: "course", title: "Course qualité modérée", km: 9, pace: "4:05-4:25/km", details: "15 min échauffement + 4-5 accélérations progressives de 20 sec + retour au calme. Garder de la fraîcheur pour le week-end.", blocks: [
         { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km" },
         { label: "Accélérations progressives", duration: "4-5 × 20 sec", pace: "4:05-4:25/km", note: "Vif sans aller chercher le chrono à fond sur chaque répétition — garder de la fraîcheur pour le week-end." },
@@ -185,10 +210,11 @@ const PLAN = [
       ] },
       { type: "repos", title: "Repos", details: "En option, sans fatigue :", renfoKey: "ACTIVATION" },
       { type: "course", title: "Vallonné très léger", km: 8, dplus: 100, pace: "5:30-5:50/km", details: "Jambes actives sans les fatiguer avant la sortie reine du lendemain." },
+      { type: "repos", title: "Repos complet" },
       { type: "course", title: "Sortie longue de référence — 40 km", km: 40, dplus: 750, pace: "5:45-6:15/km sur le plat", details: "La grosse sortie de la préparation, 3 semaines avant la course pile. Ravitaillement réel (60 g glucides/h), gestion des transitions course/marche sur terrain technique. Le rythme global de la journée (marche comprise) tournera plutôt vers 6:30-7:00/km, comme le jour J. Si possible, termine sur du sable pour retrouver la sensation des 10 derniers km du parcours." },
     ],
   }),
-  ...construction("2026-08-24", "S7 — Décharge", 8, "15 min échauffement + 4-5 lignes droites de 20 sec + retour au calme. Intensité minimale, semaine de décharge.", 7, 8, 150, 20, 180, "Pas de recherche de performance, volume tranquille.", "libre, sans chrono", undefined, [
+  ...constructionV2("2026-08-24", "S7 — Décharge", 8, "15 min échauffement + 4-5 lignes droites de 20 sec + retour au calme. Intensité minimale, semaine de décharge.", 7, 8, 150, 20, 180, "Pas de recherche de performance, volume tranquille.", "libre, sans chrono", undefined, [
     { label: "Échauffement", duration: "15 min", pace: "5:50-6:15/km" },
     { label: "Lignes droites", duration: "4-5 × 20 sec", pace: "vif, sans forcer", note: "Retour marché entre chaque." },
     { label: "Retour au calme", duration: "8-10 min", pace: "5:50-6:15/km" },
@@ -806,6 +832,12 @@ export default function TrailPrepApp() {
   const [weather, setWeather] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [stravaAuth, setStravaAuthState] = useState(() => getStravaAuth());
+  const [stravaActivities, setStravaActivities] = useState(null);
+
+  useEffect(() => {
+    if (!stravaAuth) return;
+    fetchStravaActivities(30).then(setStravaActivities).catch(() => {});
+  }, [stravaAuth]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -977,9 +1009,10 @@ export default function TrailPrepApp() {
           submitLog={submitLog} feedback={feedback} isToday={cursor === todayIso}
           coachComment={coachComment} coachLoading={coachLoading}
           weather={weather} weatherLoading={weatherLoading}
+          stravaActivities={stravaActivities}
         />
       )}
-      {tab === "journal" && <JournalView entries={entries} />}
+      {tab === "journal" && <JournalView entries={entries} onImportEntries={persist} />}
       {tab === "suivi" && <SuiviView entries={entries} />}
 
       {saveError && (
@@ -1021,8 +1054,12 @@ export default function TrailPrepApp() {
 /* ============================================================
    VUE — AUJOURD'HUI
    ============================================================ */
-function TodayView({ cursor, goDay, plan, logged, formOpen, setFormOpen, submitLog, feedback, isToday, coachComment, coachLoading, weather, weatherLoading }) {
+function TodayView({ cursor, goDay, plan, logged, formOpen, setFormOpen, submitLog, feedback, isToday, coachComment, coachLoading, weather, weatherLoading, stravaActivities }) {
   const runnable = plan && (plan.type === "course" || plan.type === "course_renfo" || plan.type === "race");
+  const [prefillActivity, setPrefillActivity] = useState(null);
+  const stravaMatch = !logged && runnable && stravaActivities
+    ? stravaActivities.find((a) => (a.start_date_local || "").slice(0, 10) === cursor)
+    : null;
   return (
     <div style={{ padding: "18px", paddingLeft: "calc(18px + env(safe-area-inset-left))", paddingRight: "calc(18px + env(safe-area-inset-right))" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
@@ -1073,6 +1110,21 @@ function TodayView({ cursor, goDay, plan, logged, formOpen, setFormOpen, submitL
           {(plan.type === "renfo" || plan.type === "repos") && plan.details && <p style={{ fontSize: 13, lineHeight: 1.5, color: "#3A3A3F", marginTop: 8 }}>{plan.details}</p>}
           {plan.renfoKey && <RenfoDetail renfoKey={plan.renfoKey} />}
 
+          {stravaMatch && !formOpen && (
+            <div style={{ marginTop: 12, background: "#FFF3EC", border: "1px solid #FC5200", borderRadius: 12, padding: "10px 12px" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#FC5200", marginBottom: 3 }}>🔗 Séance Strava détectée</div>
+              <div style={{ fontSize: 12, color: BODY_TEXT, marginBottom: 8 }}>
+                {stravaMatch.name || "Course"} — {(stravaMatch.distance / 1000).toFixed(2)} km, {secToDurationStr(stravaMatch.moving_time)}
+              </div>
+              <button onClick={() => { setPrefillActivity(stravaMatch); setFormOpen(true); }} style={{
+                background: "#FC5200", color: "white", border: "none", borderRadius: 9, padding: "8px 0",
+                width: "100%", fontSize: 12.5, fontWeight: 600, cursor: "pointer",
+              }}>
+                Logger cette séance
+              </button>
+            </div>
+          )}
+
           {runnable && !logged && !formOpen && (
             <button onClick={() => setFormOpen(true)} style={primaryBtnStyle}>
               Enregistrer cette séance
@@ -1085,7 +1137,7 @@ function TodayView({ cursor, goDay, plan, logged, formOpen, setFormOpen, submitL
       )}
 
       {formOpen && plan && (
-        <LogForm plan={plan} cursor={cursor} onCancel={() => setFormOpen(false)} onSubmit={submitLog} />
+        <LogForm plan={plan} cursor={cursor} onCancel={() => setFormOpen(false)} onSubmit={submitLog} prefillActivity={prefillActivity} />
       )}
 
       {feedback && (
@@ -1220,7 +1272,7 @@ const primaryBtnStyle = {
 /* ============================================================
    FORMULAIRE DE SAISIE
    ============================================================ */
-function LogForm({ plan, cursor, onCancel, onSubmit }) {
+function LogForm({ plan, cursor, onCancel, onSubmit, prefillActivity }) {
   const [km, setKm] = useState(plan.km || "");
   const [duration, setDuration] = useState("");
   const [dplus, setDplus] = useState(plan.dplus || "");
@@ -1235,6 +1287,11 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
   const [stravaList, setStravaList] = useState(null);
   const [stravaLoading, setStravaLoading] = useState(false);
   const [stravaError, setStravaError] = useState(null);
+
+  useEffect(() => {
+    if (prefillActivity) pickStravaActivity(prefillActivity);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleStravaImport() {
     if (stravaList) { setStravaList(null); return; }
@@ -1444,12 +1501,14 @@ function formatExportText(entries) {
   return lines.join("\n");
 }
 
-function JournalView({ entries }) {
+function JournalView({ entries, onImportEntries }) {
   const list = Object.values(entries).sort((a, b) => b.date.localeCompare(a.date));
   const [openDate, setOpenDate] = useState(null);
   const [copied, setCopied] = useState(false);
   const [exportText, setExportText] = useState(null);
   const [stravaConnected, setStravaConnected] = useState(() => !!getStravaAuth());
+  const [backfillLoading, setBackfillLoading] = useState(false);
+  const [backfillMsg, setBackfillMsg] = useState(null);
 
   async function handleExport() {
     const text = formatExportText(entries);
@@ -1468,6 +1527,35 @@ function JournalView({ entries }) {
       setStravaConnected(false);
     } else {
       window.location.href = stravaConnectUrl();
+    }
+  }
+
+  async function handleBackfill() {
+    setBackfillLoading(true);
+    setBackfillMsg(null);
+    try {
+      const data = await fetchStravaActivities(60);
+      const next = { ...entries };
+      let added = 0;
+      (Array.isArray(data) ? data : []).forEach((a) => {
+        const date = (a.start_date_local || "").slice(0, 10);
+        const km = Math.round((a.distance / 1000) * 100) / 100;
+        if (!date || !km || next[date]) return; // ne touche jamais une séance déjà loggée
+        next[date] = {
+          date, km, paceSec: Math.round(a.moving_time / km),
+          dplus: Math.round(a.total_elevation_gain || 0),
+          pain: 0, rpe: 5,
+          note: "Importé depuis Strava — vérifie la douleur et le ressenti.",
+          title: a.name || null, elapsedSec: a.elapsed_time || null,
+        };
+        added++;
+      });
+      onImportEntries(next);
+      setBackfillMsg(added > 0 ? `${added} séance(s) importée(s).` : "Rien de nouveau à importer.");
+    } catch (e) {
+      setBackfillMsg("Import impossible — vérifie la connexion Strava.");
+    } finally {
+      setBackfillLoading(false);
     }
   }
 
@@ -1491,6 +1579,18 @@ function JournalView({ entries }) {
           </button>
         </div>
       </div>
+
+      {stravaConnected && (
+        <div style={{ marginBottom: 14 }}>
+          <button onClick={handleBackfill} disabled={backfillLoading} style={{
+            width: "100%", background: "white", border: "1px solid #FC5200", borderRadius: 10,
+            padding: "9px 0", fontSize: 12.5, fontWeight: 600, color: "#FC5200", cursor: "pointer",
+          }}>
+            {backfillLoading ? "Import en cours…" : "Importer mon historique Strava"}
+          </button>
+          {backfillMsg && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 6, textAlign: "center" }}>{backfillMsg}</div>}
+        </div>
+      )}
 
       {list.length === 0 && (
         <div style={{ padding: "32px 0", textAlign: "center", color: "#8A8A92", fontSize: 13.5 }}>Aucune séance enregistrée pour l'instant.</div>
@@ -1603,11 +1703,20 @@ function SuiviView({ entries }) {
     const byWeek = {};
     list.forEach((e) => {
       const wk = isoWeekKey(e.date);
-      byWeek[wk] = (byWeek[wk] || 0) + e.km;
+      byWeek[wk] = byWeek[wk] || { actual: 0, planned: 0 };
+      byWeek[wk].actual += e.km;
     });
-    return Object.entries(byWeek).sort((a, b) => a[0].localeCompare(b[0])).map(([wk, km]) => ({
+    Object.values(PLAN_BY_DATE).forEach((p) => {
+      if (p.km && (p.type === "course" || p.type === "course_renfo" || p.type === "race")) {
+        const wk = isoWeekKey(p.date);
+        byWeek[wk] = byWeek[wk] || { actual: 0, planned: 0 };
+        byWeek[wk].planned += p.km;
+      }
+    });
+    return Object.entries(byWeek).sort((a, b) => a[0].localeCompare(b[0])).map(([wk, v]) => ({
       week: new Date(wk + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "short" }),
-      km: Math.round(km * 10) / 10,
+      actual: Math.round(v.actual * 10) / 10,
+      planned: Math.round(v.planned * 10) / 10,
     }));
   }, [list]);
 
@@ -1643,7 +1752,7 @@ function SuiviView({ entries }) {
       </Card>
 
       <Card>
-        <SectionTitle>Volume hebdomadaire</SectionTitle>
+        <SectionTitle>Volume hebdomadaire — réalisé vs prévu</SectionTitle>
         <div style={{ height: 170 }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={weekly} margin={{ top: 6, right: 8, left: -18, bottom: 0 }}>
@@ -1656,10 +1765,15 @@ function SuiviView({ entries }) {
               <CartesianGrid stroke={SILVER} strokeDasharray="3 4" vertical={false} />
               <XAxis dataKey="week" tick={{ fontSize: 9.5, fill: MUTED }} axisLine={{ stroke: SILVER }} tickLine={false} />
               <YAxis tick={{ fontSize: 9.5, fill: MUTED }} axisLine={false} tickLine={false} />
-              <Tooltip formatter={(v) => [v + " km", "Volume"]} contentStyle={{ fontSize: 12, borderRadius: 10, border: `1px solid ${SILVER}`, boxShadow: "0 4px 14px rgba(21,21,23,0.1)" }} />
-              <Bar dataKey="km" fill="url(#barFill)" radius={[5, 5, 0, 0]} maxBarSize={26} />
+              <Tooltip formatter={(v, name) => [v + " km", name === "actual" ? "Réalisé" : "Prévu"]} contentStyle={{ fontSize: 12, borderRadius: 10, border: `1px solid ${SILVER}`, boxShadow: "0 4px 14px rgba(21,21,23,0.1)" }} />
+              <Bar dataKey="actual" fill="url(#barFill)" radius={[5, 5, 0, 0]} maxBarSize={20} />
+              <Bar dataKey="planned" fill={SILVER} radius={[5, 5, 0, 0]} maxBarSize={20} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+        <div style={{ display: "flex", gap: 14, marginTop: 6, fontSize: 10.5, color: MUTED }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 9, height: 9, borderRadius: 2, background: INK, display: "inline-block" }} /> Réalisé</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 9, height: 9, borderRadius: 2, background: SILVER, display: "inline-block", border: `1px solid ${MUTED}` }} /> Prévu</span>
         </div>
       </Card>
 
