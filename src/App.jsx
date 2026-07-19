@@ -357,6 +357,72 @@ function weatherLabel(weather) {
   return parts.join(" · ");
 }
 
+/* ============================================================
+   STRAVA — connexion OAuth + récupération des séances
+   ============================================================ */
+const STRAVA_CLIENT_ID = "266332";
+
+function getStravaAuth() {
+  try {
+    const raw = localStorage.getItem("stravaAuth");
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+function setStravaAuth(auth) {
+  try { localStorage.setItem("stravaAuth", JSON.stringify(auth)); } catch (e) { /* best effort */ }
+}
+function clearStravaAuth() {
+  try { localStorage.removeItem("stravaAuth"); } catch (e) { /* best effort */ }
+}
+function stravaConnectUrl() {
+  const redirect = window.location.origin + window.location.pathname;
+  return `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirect)}&response_type=code&scope=activity:read_all&approval_prompt=auto`;
+}
+
+async function stravaApiCall(payload) {
+  const res = await fetch("/api/strava", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Erreur Strava");
+  return data;
+}
+
+async function exchangeStravaCode(code) {
+  const data = await stravaApiCall({ action: "exchange", code });
+  const auth = {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: data.expires_at,
+    athleteName: data.athlete ? `${data.athlete.firstname} ${data.athlete.lastname}` : null,
+  };
+  setStravaAuth(auth);
+  return auth;
+}
+
+async function getValidStravaAccessToken() {
+  const auth = getStravaAuth();
+  if (!auth) return null;
+  const now = Math.floor(Date.now() / 1000);
+  if (auth.expires_at && auth.expires_at > now + 60) {
+    return auth.access_token;
+  }
+  const data = await stravaApiCall({ action: "refresh", refresh_token: auth.refresh_token });
+  const next = { ...auth, access_token: data.access_token, refresh_token: data.refresh_token, expires_at: data.expires_at };
+  setStravaAuth(next);
+  return next.access_token;
+}
+
+async function fetchStravaActivities(perPage = 10) {
+  const token = await getValidStravaAccessToken();
+  if (!token) throw new Error("Non connecté à Strava.");
+  return await stravaApiCall({ action: "activities", access_token: token, per_page: perPage });
+}
+
 async function extractRunFromImages(images) {
   // images: [{ base64, mediaType }]
   const content = [
@@ -739,6 +805,20 @@ export default function TrailPrepApp() {
   const [saveError, setSaveError] = useState(false);
   const [weather, setWeather] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
+  const [stravaAuth, setStravaAuthState] = useState(() => getStravaAuth());
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    if (code) {
+      exchangeStravaCode(code)
+        .then((auth) => setStravaAuthState(auth))
+        .catch(() => {})
+        .finally(() => {
+          window.history.replaceState({}, "", window.location.pathname);
+        });
+    }
+  }, []);
 
   useEffect(() => {
     const raw = localStorage.getItem("traildata");
@@ -1152,6 +1232,37 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
   const [dateWarning, setDateWarning] = useState(null);
   const [filledCount, setFilledCount] = useState(0);
   const [extractedExtra, setExtractedExtra] = useState(null);
+  const [stravaList, setStravaList] = useState(null);
+  const [stravaLoading, setStravaLoading] = useState(false);
+  const [stravaError, setStravaError] = useState(null);
+
+  async function handleStravaImport() {
+    if (stravaList) { setStravaList(null); return; }
+    setStravaLoading(true);
+    setStravaError(null);
+    try {
+      const data = await fetchStravaActivities(10);
+      setStravaList(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setStravaError("Import impossible — vérifie que Strava est bien connecté (onglet Journal).");
+    } finally {
+      setStravaLoading(false);
+    }
+  }
+
+  function pickStravaActivity(a) {
+    setKm(String(Math.round((a.distance / 1000) * 100) / 100));
+    setDuration(secToDurationStr(a.moving_time));
+    setDplus(String(Math.round(a.total_elevation_gain || 0)));
+    setExtractedExtra({ title: a.name || null, splits: null, zones: null, intervals: null, vapPaceSec: null, elapsedSec: a.elapsed_time || null });
+    const activityDate = (a.start_date_local || "").slice(0, 10);
+    if (activityDate && activityDate !== cursor) {
+      setDateWarning(`Cette séance Strava date du ${fmtDate(activityDate)} — tu es sur le ${fmtDate(cursor)}. Vérifie que c'est le bon jour avant de valider.`);
+    } else {
+      setDateWarning(null);
+    }
+    setStravaList(null);
+  }
 
   function parseDuration(str) {
     const parts = str.split(":").map((p) => parseInt(p, 10));
@@ -1231,6 +1342,31 @@ function LogForm({ plan, cursor, onCancel, onSubmit }) {
         <input type="file" accept="image/*" multiple onChange={handleImage} style={{ display: "none" }} disabled={extracting} />
         {extracting ? "Lecture des captures…" : "📷 Ajouter une ou plusieurs captures d'écran (Strava…)"}
       </label>
+
+      <button onClick={handleStravaImport} disabled={stravaLoading} style={{
+        width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        border: "1px solid #FC5200", borderRadius: 12, padding: "11px 10px", marginBottom: 14,
+        color: "#FC5200", fontSize: 13, fontWeight: 600, cursor: "pointer", background: "white",
+      }}>
+        {stravaLoading ? "Chargement…" : stravaList ? "Masquer la liste" : "🔗 Importer depuis Strava"}
+      </button>
+      {stravaError && <div style={{ fontSize: 12, color: CORAL, marginBottom: 10 }}>{stravaError}</div>}
+      {stravaList && (
+        <div style={{ marginBottom: 14, border: `1px solid ${SILVER}`, borderRadius: 12, overflow: "hidden" }}>
+          {stravaList.length === 0 && <div style={{ padding: 12, fontSize: 12.5, color: MUTED }}>Aucune séance récente trouvée.</div>}
+          {stravaList.map((a) => (
+            <button key={a.id} onClick={() => pickStravaActivity(a)} style={{
+              width: "100%", textAlign: "left", background: "white", border: "none",
+              borderTop: `1px solid ${SILVER}`, padding: "10px 12px", cursor: "pointer",
+            }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700 }}>{a.name || "Course"}</div>
+              <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>
+                {fmtDate((a.start_date_local || "").slice(0, 10))} · {(a.distance / 1000).toFixed(2)} km · {secToDurationStr(a.moving_time)}{a.total_elevation_gain ? ` · D+${Math.round(a.total_elevation_gain)}m` : ""}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
       {extractError && <div style={{ fontSize: 12, color: CORAL, marginBottom: 10 }}>{extractError}</div>}
       {dateWarning && <div style={{ fontSize: 12, color: SAND, marginBottom: 10, background: "#EFE7DA", borderRadius: 8, padding: "7px 9px" }}>{dateWarning}</div>}
       {filledCount > 0 && !extractError && (
@@ -1313,6 +1449,7 @@ function JournalView({ entries }) {
   const [openDate, setOpenDate] = useState(null);
   const [copied, setCopied] = useState(false);
   const [exportText, setExportText] = useState(null);
+  const [stravaConnected, setStravaConnected] = useState(() => !!getStravaAuth());
 
   async function handleExport() {
     const text = formatExportText(entries);
@@ -1325,20 +1462,39 @@ function JournalView({ entries }) {
     }
   }
 
-  if (list.length === 0) {
-    return <div style={{ padding: 32, textAlign: "center", color: "#8A8A92", fontSize: 13.5 }}>Aucune séance enregistrée pour l'instant.</div>;
+  function handleStravaClick() {
+    if (stravaConnected) {
+      clearStravaAuth();
+      setStravaConnected(false);
+    } else {
+      window.location.href = stravaConnectUrl();
+    }
   }
+
   return (
     <div style={{ padding: "18px", paddingLeft: "calc(18px + env(safe-area-inset-left))", paddingRight: "calc(18px + env(safe-area-inset-right))" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 8 }}>
         <div style={{ fontFamily: DISPLAY_FONT, fontSize: 26, fontWeight: 900, letterSpacing: "-0.02em" }}>Journal.</div>
-        <button onClick={handleExport} style={{
-          background: PAPER, border: `1px solid ${SILVER}`, borderRadius: 10, padding: "7px 12px",
-          fontSize: 11.5, fontWeight: 600, color: INK, cursor: "pointer",
-        }}>
-          {copied ? "Copié ✓" : "Exporter"}
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={handleStravaClick} style={{
+            background: stravaConnected ? "#FC5200" : PAPER, border: `1px solid ${stravaConnected ? "#FC5200" : SILVER}`,
+            borderRadius: 10, padding: "7px 12px", fontSize: 11.5, fontWeight: 600,
+            color: stravaConnected ? "white" : INK, cursor: "pointer",
+          }}>
+            {stravaConnected ? "Strava ✓" : "Connecter Strava"}
+          </button>
+          <button onClick={handleExport} style={{
+            background: PAPER, border: `1px solid ${SILVER}`, borderRadius: 10, padding: "7px 12px",
+            fontSize: 11.5, fontWeight: 600, color: INK, cursor: "pointer",
+          }}>
+            {copied ? "Copié ✓" : "Exporter"}
+          </button>
+        </div>
       </div>
+
+      {list.length === 0 && (
+        <div style={{ padding: "32px 0", textAlign: "center", color: "#8A8A92", fontSize: 13.5 }}>Aucune séance enregistrée pour l'instant.</div>
+      )}
 
       {exportText && (
         <Card>
