@@ -1709,7 +1709,8 @@ function JournalView({ entries, onImportEntries, stravaConnectError }) {
    VUE — SUIVI
    ============================================================ */
 function SuiviView({ entries }) {
-  const list = Object.values(entries).sort((a, b) => a.date.localeCompare(b.date));
+  const SUIVI_START = "2026-06-01";
+  const list = Object.values(entries).filter((e) => e.date >= SUIVI_START).sort((a, b) => a.date.localeCompare(b.date));
 
   const paceData = list.map((e) => ({ date: e.date.slice(5), pace: e.paceSec, label: fmtDate(e.date) }));
 
