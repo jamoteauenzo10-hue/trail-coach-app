@@ -839,13 +839,21 @@ export default function TrailPrepApp() {
     fetchStravaActivities(30).then(setStravaActivities).catch(() => {});
   }, [stravaAuth]);
 
+  const [stravaConnectError, setStravaConnectError] = useState(null);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
+    const oauthError = params.get("error");
+    if (oauthError) {
+      setStravaConnectError(`Strava a renvoyé une erreur : ${oauthError}`);
+      window.history.replaceState({}, "", window.location.pathname);
+      return;
+    }
     if (code) {
       exchangeStravaCode(code)
         .then((auth) => setStravaAuthState(auth))
-        .catch(() => {})
+        .catch((e) => setStravaConnectError(e.message || "Échec de la connexion Strava."))
         .finally(() => {
           window.history.replaceState({}, "", window.location.pathname);
         });
@@ -1012,7 +1020,7 @@ export default function TrailPrepApp() {
           stravaActivities={stravaActivities}
         />
       )}
-      {tab === "journal" && <JournalView entries={entries} onImportEntries={persist} />}
+      {tab === "journal" && <JournalView entries={entries} onImportEntries={persist} stravaConnectError={stravaConnectError} />}
       {tab === "suivi" && <SuiviView entries={entries} />}
 
       {saveError && (
@@ -1501,7 +1509,7 @@ function formatExportText(entries) {
   return lines.join("\n");
 }
 
-function JournalView({ entries, onImportEntries }) {
+function JournalView({ entries, onImportEntries, stravaConnectError }) {
   const list = Object.values(entries).sort((a, b) => b.date.localeCompare(a.date));
   const [openDate, setOpenDate] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -1579,6 +1587,12 @@ function JournalView({ entries, onImportEntries }) {
           </button>
         </div>
       </div>
+
+      {stravaConnectError && (
+        <div style={{ background: "#F5DAD5", color: CORAL, borderRadius: 10, padding: "9px 12px", fontSize: 12, marginBottom: 14 }}>
+          {stravaConnectError}
+        </div>
+      )}
 
       {stravaConnected && (
         <div style={{ marginBottom: 14 }}>
